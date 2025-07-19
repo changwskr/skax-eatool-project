@@ -108,7 +108,7 @@
         SELECT * FROM user_activities 
         <where>
             <if test="userId != null and userId != ''">
-                AND user_id = #{userId}
+                AND user_id LIKE CONCAT('%', #{userId}, '%')
             </if>
             <if test="activityType != null and activityType != ''">
                 AND activity_type = #{activityType}

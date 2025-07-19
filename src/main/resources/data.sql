@@ -238,7 +238,12 @@ INSERT INTO user_activities (user_id, activity_type, description, ip_address, us
 ('USER006', 'LOGIN', '사용자 로그인 성공', '192.168.1.105', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36', 'SESS008', 'SUCCESS', 95, '{"loginAttempt": 1}', NOW() - INTERVAL 30 MINUTE),
 ('USER007', 'UPDATE', '프로필 정보 수정', '192.168.1.106', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'SESS009', 'SUCCESS', 180, '{"operation": "profile_update", "field": "phone"}', NOW() - INTERVAL 15 MINUTE),
 ('ADMIN002', 'CREATE', '새 텔러 등록: TELLER014', '192.168.1.201', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'SESS006', 'SUCCESS', 320, '{"operation": "teller_registration", "tellerId": "TELLER014"}', NOW() - INTERVAL 10 MINUTE),
-('USER008', 'LOGOUT', '사용자 로그아웃', '192.168.1.107', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'SESS010', 'SUCCESS', 35, '{"logoutReason": "user_request"}', NOW() - INTERVAL 5 MINUTE);
+('USER008', 'LOGOUT', '사용자 로그아웃', '192.168.1.107', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'SESS010', 'SUCCESS', 35, '{"logoutReason": "user_request"}', NOW() - INTERVAL 5 MINUTE),
+
+-- Admin User Activities (admin 사용자 활동 로그 - 3건)
+('admin', 'LOGIN', '관리자 로그인 성공', '192.168.1.200', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'SESS011', 'SUCCESS', 90, '{"loginAttempt": 1, "adminAccess": true}', '2024-01-15 08:00:00'),
+('admin', 'CREATE', '새 사용자 등록: USER013', '192.168.1.200', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'SESS011', 'SUCCESS', 300, '{"operation": "user_registration", "newUserId": "USER013"}', '2024-01-15 14:00:00'),
+('admin', 'UPDATE', '사용자 정보 수정: USER001', '192.168.1.200', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'SESS011', 'SUCCESS', 250, '{"operation": "user_update", "userId": "USER001", "field": "email"}', '2024-01-15 15:30:00');
 
 -- ========================================
 -- 7. TRANSACTION LOG TABLE DATA (거래 로그 데이터)

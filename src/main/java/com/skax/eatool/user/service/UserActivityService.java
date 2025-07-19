@@ -333,13 +333,17 @@ public class UserActivityService implements UserActivityServicePort {
     @Override
     public List<UserActivity> searchActivities(String userId, String activityType, String status,
             String ipAddress, LocalDateTime startDate, LocalDateTime endDate) {
-        log.info("[UserActivityService] searchActivities START - userId: {}, activityType: {}, status: {}",
-                userId, activityType, status);
+        log.info(
+                "[UserActivityService] searchActivities START - userId: '{}', activityType: '{}', status: '{}', ipAddress: '{}', startDate: {}, endDate: {}",
+                userId, activityType, status, ipAddress, startDate, endDate);
 
         List<UserActivity> result = userActivityRepositoryPort.findByAdvancedSearch(userId, activityType, status,
                 ipAddress, startDate, endDate);
 
         log.info("[UserActivityService] searchActivities END - count: {}", result.size());
+        if (result.size() > 0) {
+            log.info("[UserActivityService] searchActivities - first result userId: '{}'", result.get(0).getUserId());
+        }
         return result;
     }
 

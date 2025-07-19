@@ -14,6 +14,8 @@ import com.skax.eatool.teller.repository.TellerRepository;
 import com.skax.eatool.user.infrastructure.jpa.UserJpaEntity;
 import com.skax.eatool.user.infrastructure.jpa.UserRepositoryJpa;
 import com.skax.eatool.user.domain.UserStatus;
+import com.skax.eatool.user.infrastructure.jpa.UserActivityEntity;
+import com.skax.eatool.user.infrastructure.jpa.UserActivityRepositoryJpa;
 import com.skax.eatool.techspec.infrastructure.jpa.TechSpecEntity;
 import com.skax.eatool.techspec.infrastructure.jpa.TechSpecRepository;
 import org.slf4j.Logger;
@@ -63,6 +65,9 @@ public class DataInitializer implements CommandLineRunner {
         @Autowired
         private TechSpecRepository techSpecRepository;
 
+        @Autowired
+        private UserActivityRepositoryJpa userActivityRepository;
+
         @Override
         public void run(String... args) throws Exception {
                 logger.info("Starting comprehensive data initialization...");
@@ -104,6 +109,7 @@ public class DataInitializer implements CommandLineRunner {
                 createCashCards(currentDate, currentTime);
                 createHotCards(currentDate, currentTime);
                 createTransactionLogs(currentDate, currentTime);
+                createUserActivities(currentDate, currentTime);
                 createTechSpecs(currentDate, currentTime);
 
                 logger.info("Comprehensive test data created successfully!");
@@ -853,6 +859,82 @@ public class DataInitializer implements CommandLineRunner {
                 techSpec.setUpdatedBy(createdBy);
                 techSpec.setActive(isActive);
                 return techSpec;
+        }
+
+        private void createUserActivities(String currentDate, String currentTime) {
+                logger.info("Creating user activities...");
+
+                List<UserActivityEntity> activities = Arrays.asList(
+                                // Login Activities
+                                createUserActivity("USER001", "LOGIN", "사용자 로그인 성공", "192.168.1.100",
+                                                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                                                "SESS001", "SUCCESS", 150L,
+                                                "{\"loginAttempt\": 1}",
+                                                LocalDateTime.of(2024, 1, 15, 9, 30, 0)),
+                                createUserActivity("USER002", "LOGIN", "사용자 로그인 성공", "192.168.1.101",
+                                                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+                                                "SESS002", "SUCCESS", 120L,
+                                                "{\"loginAttempt\": 1}",
+                                                LocalDateTime.of(2024, 1, 15, 10, 15, 0)),
+                                createUserActivity("ADMIN001", "LOGIN", "관리자 로그인 성공", "192.168.1.200",
+                                                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                                                "SESS004", "SUCCESS", 90L,
+                                                "{\"loginAttempt\": 1, \"adminAccess\": true}",
+                                                LocalDateTime.of(2024, 1, 15, 8, 0, 0)),
+
+                                // Admin User Activities (admin 사용자 활동 로그 - 3건)
+                                createUserActivity("admin", "LOGIN", "관리자 로그인 성공", "192.168.1.200",
+                                                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                                                "SESS011", "SUCCESS", 90L,
+                                                "{\"loginAttempt\": 1, \"adminAccess\": true}",
+                                                LocalDateTime.of(2024, 1, 15, 8, 0, 0)),
+                                createUserActivity("admin", "CREATE", "새 사용자 등록: USER013", "192.168.1.200",
+                                                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                                                "SESS011", "SUCCESS", 300L,
+                                                "{\"operation\": \"user_registration\", \"newUserId\": \"USER013\"}",
+                                                LocalDateTime.of(2024, 1, 15, 14, 0, 0)),
+                                createUserActivity("admin", "UPDATE", "사용자 정보 수정: USER001", "192.168.1.200",
+                                                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                                                "SESS011", "SUCCESS", 250L,
+                                                "{\"operation\": \"user_update\", \"userId\": \"USER001\", \"field\": \"email\"}",
+                                                LocalDateTime.of(2024, 1, 15, 15, 30, 0)),
+
+                                // Recent Activities
+                                createUserActivity("USER005", "LOGIN", "사용자 로그인 성공", "192.168.1.104",
+                                                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                                                "SESS007", "SUCCESS", 110L,
+                                                "{\"loginAttempt\": 1}",
+                                                LocalDateTime.now().minusHours(1)),
+                                createUserActivity("USER006", "LOGIN", "사용자 로그인 성공", "192.168.1.105",
+                                                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+                                                "SESS008", "SUCCESS", 95L,
+                                                "{\"loginAttempt\": 1}",
+                                                LocalDateTime.now().minusMinutes(30)),
+                                createUserActivity("USER007", "UPDATE", "프로필 정보 수정", "192.168.1.106",
+                                                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                                                "SESS009", "SUCCESS", 180L,
+                                                "{\"operation\": \"profile_update\", \"field\": \"phone\"}",
+                                                LocalDateTime.now().minusMinutes(15)));
+
+                userActivityRepository.saveAll(activities);
+                logger.info("Created {} user activities", activities.size());
+        }
+
+        private UserActivityEntity createUserActivity(String userId, String activityType, String description,
+                        String ipAddress, String userAgent, String sessionId, String status,
+                        Long processingTime, String additionalInfo, LocalDateTime activityTimestamp) {
+                return UserActivityEntity.builder()
+                                .userId(userId)
+                                .activityType(activityType)
+                                .description(description)
+                                .ipAddress(ipAddress)
+                                .userAgent(userAgent)
+                                .sessionId(sessionId)
+                                .status(status)
+                                .processingTime(processingTime)
+                                .additionalInfo(additionalInfo)
+                                .activityTimestamp(activityTimestamp)
+                                .build();
         }
 
         /**

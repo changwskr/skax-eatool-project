@@ -52,8 +52,12 @@ public class UserActivityController {
         Pageable pageable = PageRequest.of(page, size, Sort.by("timestamp").descending());
 
         // 활동 로그 조회 - 고급 검색 사용
+        log.info(
+                "[UserActivityController] searchActivities parameters - userId: '{}', activityType: '{}', status: '{}'",
+                userId, activityType, status);
         List<UserActivity> allActivities = userActivityServicePort.searchActivities(userId, activityType, status, null,
                 null, null);
+        log.info("[UserActivityController] searchActivities result - count: {}", allActivities.size());
 
         // 페이지네이션 적용
         int start = (int) pageable.getOffset();

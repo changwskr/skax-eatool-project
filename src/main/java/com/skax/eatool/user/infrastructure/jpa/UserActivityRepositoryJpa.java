@@ -68,10 +68,10 @@ public interface UserActivityRepositoryJpa extends JpaRepository<UserActivityEnt
 
         // 고급 검색
         @Query("SELECT ua FROM UserActivityEntity ua WHERE " +
-                        "(:userId IS NULL OR ua.userId = :userId) AND " +
-                        "(:activityType IS NULL OR ua.activityType = :activityType) AND " +
-                        "(:status IS NULL OR ua.status = :status) AND " +
-                        "(:ipAddress IS NULL OR ua.ipAddress = :ipAddress) AND " +
+                        "(:userId IS NULL OR :userId = '' OR ua.userId LIKE CONCAT('%', :userId, '%')) AND " +
+                        "(:activityType IS NULL OR :activityType = '' OR ua.activityType = :activityType) AND " +
+                        "(:status IS NULL OR :status = '' OR ua.status = :status) AND " +
+                        "(:ipAddress IS NULL OR :ipAddress = '' OR ua.ipAddress = :ipAddress) AND " +
                         "(:startDate IS NULL OR ua.activityTimestamp >= :startDate) AND " +
                         "(:endDate IS NULL OR ua.activityTimestamp <= :endDate) " +
                         "ORDER BY ua.activityTimestamp DESC")
@@ -84,10 +84,10 @@ public interface UserActivityRepositoryJpa extends JpaRepository<UserActivityEnt
 
         // 고급 검색 결과 수 조회
         @Query("SELECT COUNT(ua) FROM UserActivityEntity ua WHERE " +
-                        "(:userId IS NULL OR ua.userId = :userId) AND " +
-                        "(:activityType IS NULL OR ua.activityType = :activityType) AND " +
-                        "(:status IS NULL OR ua.status = :status) AND " +
-                        "(:ipAddress IS NULL OR ua.ipAddress = :ipAddress) AND " +
+                        "(:userId IS NULL OR :userId = '' OR ua.userId LIKE CONCAT('%', :userId, '%')) AND " +
+                        "(:activityType IS NULL OR :activityType = '' OR ua.activityType = :activityType) AND " +
+                        "(:status IS NULL OR :status = '' OR ua.status = :status) AND " +
+                        "(:ipAddress IS NULL OR :ipAddress = '' OR ua.ipAddress = :ipAddress) AND " +
                         "(:startDate IS NULL OR ua.activityTimestamp >= :startDate) AND " +
                         "(:endDate IS NULL OR ua.activityTimestamp <= :endDate)")
         long countByAdvancedSearch(@Param("userId") String userId,

@@ -257,12 +257,20 @@ public class UserActivityRepositoryPortJpaImpl implements UserActivityRepository
         @Override
         public List<UserActivity> findByAdvancedSearch(String userId, String activityType, String status,
                         String ipAddress, LocalDateTime startDate, LocalDateTime endDate) {
-                log.info("[UserActivityRepositoryPortJpaImpl] findByAdvancedSearch START - userId: {}, activityType: {}, status: {}",
-                                userId, activityType, status);
+                log.info("[UserActivityRepositoryPortJpaImpl] findByAdvancedSearch START - userId: '{}', activityType: '{}', status: '{}', ipAddress: '{}', startDate: {}, endDate: {}",
+                                userId, activityType, status, ipAddress, startDate, endDate);
 
-                List<UserActivity> result = userActivityRepositoryJpa
-                                .findByAdvancedSearch(userId, activityType, status, ipAddress, startDate, endDate)
-                                .stream()
+                List<UserActivityEntity> entities = userActivityRepositoryJpa
+                                .findByAdvancedSearch(userId, activityType, status, ipAddress, startDate, endDate);
+
+                log.info("[UserActivityRepositoryPortJpaImpl] findByAdvancedSearch - raw entities count: {}",
+                                entities.size());
+                if (entities.size() > 0) {
+                        log.info("[UserActivityRepositoryPortJpaImpl] findByAdvancedSearch - first entity userId: '{}'",
+                                        entities.get(0).getUserId());
+                }
+
+                List<UserActivity> result = entities.stream()
                                 .map(UserActivityEntity::toDomain)
                                 .collect(Collectors.toList());
 
