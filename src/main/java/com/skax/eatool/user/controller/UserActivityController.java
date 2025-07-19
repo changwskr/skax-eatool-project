@@ -1,194 +1,265 @@
 package com.skax.eatool.user.controller;
 
 import com.skax.eatool.user.domain.UserActivity;
-import com.skax.eatool.user.dto.ApiResponse;
-import com.skax.eatool.user.service.UserActivityService;
+import com.skax.eatool.user.domain.UserActivityStatistics;
+import com.skax.eatool.user.service.port.UserActivityServicePort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
  * 사용자 활동 로그 컨트롤러
  */
-@RestController
-@RequestMapping("/api/user-activities")
-@RequiredArgsConstructor
 @Slf4j
+@Controller
+@RequestMapping("/user-management-web/activity-logs")
+@RequiredArgsConstructor
 public class UserActivityController {
 
-    private final UserActivityService userActivityService;
+    private final UserActivityServicePort userActivityServicePort;
+
+    /**
+     * 활동 로그 목록 페이지
+     */
+    @GetMapping
+    public String activityLogsPage(
+            @RequestParam(required = false) String userId,
+            @RequestParam(required = false) String activityType,
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Model model) {
+
+        log.info(
+                "[UserActivityController] activityLogsPage START - userId: {}, activityType: {}, status: {}, page: {}, size: {}",
+                userId, activityType, status, page, size);
+
+        // 통계 정보 조회
+        UserActivityStatistics statistics = userActivityServicePort.getActivityStatistics();
+        model.addAttribute("statistics", statistics);
+
+        // 페이지네이션 설정
+        Pageable pageable = PageRequest.of(page, size, Sort.by("timestamp").descending());
+
+        // 활동 로그 조회
+        Page<UserActivity> activitiesPage;
+        if (userId != null && !userId.trim().isEmpty()) {
+            activitiesPage = userActivityServicePort.getActivitiesByUserId(userId, pageable);
+        } else {
+            activitiesPage = userActivityServicePort.getActivities(pageable);
+        }
+
+        // 필터링된 결과 적용
+        List<UserActivity> filteredActivities = activitiesPage.getContent();
+        if (activityType != null && !activityType.trim().isEmpty()) {
+            filteredActivities = filteredActivities.stream()
+                    .filter(activity -> activityType.equals(activity.getActivityType()))
+                    .toList();
+        }
+        if (status != null && !status.trim().isEmpty()) {
+            filteredActivities = filteredActivities.stream()
+                    .filter(activity -> status.equals(activity.getStatus()))
+                    .toList();
+        }
+
+        // 모델에 데이터 추가
+        model.addAttribute("activities", filteredActivities);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", activitiesPage.getTotalPages());
+        model.addAttribute("totalElements", activitiesPage.getTotalElements());
+        model.addAttribute("userId", userId);
+        model.addAttribute("activityType", activityType);
+        model.addAttribute("status", status);
+        model.addAttribute("title", "활동 로그");
+
+        log.info("[UserActivityController] activityLogsPage END - activitiesCount: {}", filteredActivities.size());
+        return "user/management/activity-logs";
+    }
+
+    /**
+     * 활동 로그 상세 정보 (AJAX)
+     */
+    @GetMapping("/{id}")
+    @ResponseBody
+    public UserActivity getActivityDetail(@PathVariable Long id) {
+        log.info("[UserActivityController] getActivityDetail START - id: {}", id);
+
+        UserActivity activity = userActivityServicePort.getActivityById(id);
+
+        log.info("[UserActivityController] getActivityDetail END - id: {}", activity.getId());
+        return activity;
+    }
 
     /**
      * 사용자별 활동 로그 조회
      */
     @GetMapping("/user/{userId}")
-    public ApiResponse<List<UserActivity>> getUserActivities(@PathVariable Long userId) {
-        log.info("Getting user activities for userId: {}", userId);
-        List<UserActivity> activities = userActivityService.getUserActivities(userId);
-        return ApiResponse.ok(activities);
-    }
+    public String getUserActivities(
+            @PathVariable String userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Model model) {
 
-    /**
-     * 사용자별 활동 로그 페이징 조회
-     */
-    @GetMapping("/user/{userId}/page")
-    public ApiResponse<Page<UserActivity>> getUserActivitiesPage(@PathVariable Long userId, Pageable pageable) {
-        log.info("Getting user activities page for userId: {} with pageable: {}", userId, pageable);
-        Page<UserActivity> activities = userActivityService.getUserActivities(userId, pageable);
-        return ApiResponse.ok(activities);
-    }
+        log.info("[UserActivityController] getUserActivities START - userId: {}, page: {}, size: {}",
+                userId, page, size);
 
-    /**
-     * 활동 타입별 로그 조회
-     */
-    @GetMapping("/type/{activityType}")
-    public ApiResponse<List<UserActivity>> getActivitiesByType(@PathVariable String activityType) {
-        log.info("Getting activities by type: {}", activityType);
-        List<UserActivity> activities = userActivityService.getActivitiesByType(activityType);
-        return ApiResponse.ok(activities);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("timestamp").descending());
+        Page<UserActivity> activitiesPage = userActivityServicePort.getActivitiesByUserId(userId, pageable);
+
+        model.addAttribute("activities", activitiesPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", activitiesPage.getTotalPages());
+        model.addAttribute("totalElements", activitiesPage.getTotalElements());
+        model.addAttribute("userId", userId);
+        model.addAttribute("title", "사용자 활동 로그 - " + userId);
+
+        log.info("[UserActivityController] getUserActivities END - activitiesCount: {}",
+                activitiesPage.getContent().size());
+        return "user/management/activity-logs";
     }
 
     /**
      * 기간별 활동 로그 조회
      */
     @GetMapping("/date-range")
-    public ApiResponse<List<UserActivity>> getActivitiesByDateRange(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
-        log.info("Getting activities between {} and {}", startDate, endDate);
-        List<UserActivity> activities = userActivityService.getActivitiesByDateRange(startDate, endDate);
-        return ApiResponse.ok(activities);
+    public String getActivitiesByDateRange(
+            @RequestParam String startDate,
+            @RequestParam String endDate,
+            @RequestParam(required = false) String userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Model model) {
+
+        log.info("[UserActivityController] getActivitiesByDateRange START - startDate: {}, endDate: {}, userId: {}",
+                startDate, endDate, userId);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime startDateTime = LocalDateTime.parse(startDate + "T00:00:00");
+        LocalDateTime endDateTime = LocalDateTime.parse(endDate + "T23:59:59");
+
+        List<UserActivity> activities;
+        if (userId != null && !userId.trim().isEmpty()) {
+            activities = userActivityServicePort.getActivitiesByUserIdAndDateRange(userId, startDateTime, endDateTime);
+        } else {
+            activities = userActivityServicePort.getActivitiesByDateRange(startDateTime, endDateTime);
+        }
+
+        // 페이지네이션 적용
+        Pageable pageable = PageRequest.of(page, size, Sort.by("timestamp").descending());
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), activities.size());
+
+        List<UserActivity> pagedActivities = activities.subList(start, end);
+        Page<UserActivity> activitiesPage = new org.springframework.data.domain.PageImpl<>(
+                pagedActivities, pageable, activities.size());
+
+        model.addAttribute("activities", activitiesPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", activitiesPage.getTotalPages());
+        model.addAttribute("totalElements", activitiesPage.getTotalElements());
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+        model.addAttribute("userId", userId);
+        model.addAttribute("title", "기간별 활동 로그");
+
+        log.info("[UserActivityController] getActivitiesByDateRange END - activitiesCount: {}",
+                activitiesPage.getContent().size());
+        return "user/management/activity-logs";
     }
 
     /**
-     * 사용자별 기간별 활동 로그 조회
+     * 활동 타입별 로그 조회
      */
-    @GetMapping("/user/{userId}/date-range")
-    public ApiResponse<List<UserActivity>> getUserActivitiesByDateRange(
-            @PathVariable Long userId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
-        log.info("Getting user activities for userId: {} between {} and {}", userId, startDate, endDate);
-        List<UserActivity> activities = userActivityService.getUserActivitiesByDateRange(userId, startDate, endDate);
-        return ApiResponse.ok(activities);
-    }
+    @GetMapping("/type/{activityType}")
+    public String getActivitiesByType(
+            @PathVariable String activityType,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Model model) {
 
-    /**
-     * IP 주소별 활동 로그 조회
-     */
-    @GetMapping("/ip/{ipAddress}")
-    public ApiResponse<List<UserActivity>> getActivitiesByIpAddress(@PathVariable String ipAddress) {
-        log.info("Getting activities by IP address: {}", ipAddress);
-        List<UserActivity> activities = userActivityService.getActivitiesByIpAddress(ipAddress);
-        return ApiResponse.ok(activities);
-    }
+        log.info("[UserActivityController] getActivitiesByType START - activityType: {}, page: {}, size: {}",
+                activityType, page, size);
 
-    /**
-     * 상태별 활동 로그 조회
-     */
-    @GetMapping("/status/{status}")
-    public ApiResponse<List<UserActivity>> getActivitiesByStatus(@PathVariable String status) {
-        log.info("Getting activities by status: {}", status);
-        List<UserActivity> activities = userActivityService.getActivitiesByStatus(status);
-        return ApiResponse.ok(activities);
-    }
+        List<UserActivity> activities = userActivityServicePort.getActivitiesByType(activityType);
 
-    /**
-     * 최근 활동 로그 조회
-     */
-    @GetMapping("/recent")
-    public ApiResponse<List<UserActivity>> getRecentActivities(Pageable pageable) {
-        log.info("Getting recent activities with pageable: {}", pageable);
-        List<UserActivity> activities = userActivityService.getRecentActivities(pageable);
-        return ApiResponse.ok(activities);
-    }
+        // 페이지네이션 적용
+        Pageable pageable = PageRequest.of(page, size, Sort.by("timestamp").descending());
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), activities.size());
 
-    /**
-     * 모든 활동 로그 조회
-     */
-    @GetMapping
-    public ApiResponse<List<UserActivity>> getAllActivities() {
-        log.info("Getting all activities");
-        List<UserActivity> activities = userActivityService.getAllActivities();
-        return ApiResponse.ok(activities);
+        List<UserActivity> pagedActivities = activities.subList(start, end);
+        Page<UserActivity> activitiesPage = new org.springframework.data.domain.PageImpl<>(
+                pagedActivities, pageable, activities.size());
+
+        model.addAttribute("activities", activitiesPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", activitiesPage.getTotalPages());
+        model.addAttribute("totalElements", activitiesPage.getTotalElements());
+        model.addAttribute("activityType", activityType);
+        model.addAttribute("title", "활동 타입별 로그 - " + activityType);
+
+        log.info("[UserActivityController] getActivitiesByType END - activitiesCount: {}",
+                activitiesPage.getContent().size());
+        return "user/management/activity-logs";
     }
 
     /**
      * 활동 로그 삭제
      */
     @DeleteMapping("/{id}")
-    public ApiResponse<String> deleteActivity(@PathVariable Long id) {
-        log.info("Deleting activity with id: {}", id);
-        userActivityService.deleteActivity(id);
-        return ApiResponse.ok("Activity deleted successfully");
-    }
+    @ResponseBody
+    public String deleteActivity(@PathVariable Long id) {
+        log.info("[UserActivityController] deleteActivity START - id: {}", id);
 
-    /**
-     * 로그인 활동 로그 기록 (자동)
-     */
-    @PostMapping("/log-login")
-    public ApiResponse<UserActivity> logLoginActivity(
-            @RequestParam Long userId,
-            HttpServletRequest request) {
-        log.info("Logging login activity for userId: {}", userId);
-        String ipAddress = getClientIpAddress(request);
-        String userAgent = request.getHeader("User-Agent");
-        UserActivity activity = userActivityService.logLoginActivity(userId, ipAddress, userAgent);
-        return ApiResponse.ok(activity);
-    }
-
-    /**
-     * 로그아웃 활동 로그 기록 (자동)
-     */
-    @PostMapping("/log-logout")
-    public ApiResponse<UserActivity> logLogoutActivity(
-            @RequestParam Long userId,
-            HttpServletRequest request) {
-        log.info("Logging logout activity for userId: {}", userId);
-        String ipAddress = getClientIpAddress(request);
-        String userAgent = request.getHeader("User-Agent");
-        UserActivity activity = userActivityService.logLogoutActivity(userId, ipAddress, userAgent);
-        return ApiResponse.ok(activity);
-    }
-
-    /**
-     * 사용자 활동 로그 기록 (자동)
-     */
-    @PostMapping("/log-activity")
-    public ApiResponse<UserActivity> logUserActivity(
-            @RequestParam Long userId,
-            @RequestParam String activityType,
-            @RequestParam String description,
-            HttpServletRequest request) {
-        log.info("Logging user activity: userId={}, type={}, description={}", userId, activityType, description);
-        String ipAddress = getClientIpAddress(request);
-        String userAgent = request.getHeader("User-Agent");
-        UserActivity activity = userActivityService.logUserActivity(userId, activityType, description, ipAddress,
-                userAgent);
-        return ApiResponse.ok(activity);
-    }
-
-    /**
-     * 클라이언트 IP 주소 추출
-     */
-    private String getClientIpAddress(HttpServletRequest request) {
-        String xForwardedFor = request.getHeader("X-Forwarded-For");
-        if (xForwardedFor != null && !xForwardedFor.isEmpty() && !"unknown".equalsIgnoreCase(xForwardedFor)) {
-            return xForwardedFor.split(",")[0];
+        try {
+            userActivityServicePort.deleteActivity(id);
+            log.info("[UserActivityController] deleteActivity END - success");
+            return "success";
+        } catch (Exception e) {
+            log.error("[UserActivityController] deleteActivity ERROR - id: {}, error: {}", id, e.getMessage());
+            return "error";
         }
+    }
 
-        String xRealIp = request.getHeader("X-Real-IP");
-        if (xRealIp != null && !xRealIp.isEmpty() && !"unknown".equalsIgnoreCase(xRealIp)) {
-            return xRealIp;
+    /**
+     * 오래된 활동 로그 삭제
+     */
+    @DeleteMapping("/old")
+    @ResponseBody
+    public String deleteOldActivities() {
+        log.info("[UserActivityController] deleteOldActivities START");
+
+        try {
+            userActivityServicePort.deleteOldActivities();
+            log.info("[UserActivityController] deleteOldActivities END - success");
+            return "success";
+        } catch (Exception e) {
+            log.error("[UserActivityController] deleteOldActivities ERROR - error: {}", e.getMessage());
+            return "error";
         }
+    }
 
-        return request.getRemoteAddr();
+    /**
+     * 활동 로그 통계 조회 (AJAX)
+     */
+    @GetMapping("/statistics")
+    @ResponseBody
+    public UserActivityStatistics getStatistics() {
+        log.info("[UserActivityController] getStatistics START");
+
+        UserActivityStatistics statistics = userActivityServicePort.getActivityStatistics();
+
+        log.info("[UserActivityController] getStatistics END");
+        return statistics;
     }
 }

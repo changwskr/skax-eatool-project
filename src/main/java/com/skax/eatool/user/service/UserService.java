@@ -1,32 +1,23 @@
 package com.skax.eatool.user.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Qualifier;
+
 import com.skax.eatool.user.exception.CustomException;
 import com.skax.eatool.user.exception.ErrorCode;
-
 import com.skax.eatool.user.controller.port.UserServicePort;
 import com.skax.eatool.user.domain.User;
 import com.skax.eatool.user.domain.UserCreate;
 import com.skax.eatool.user.service.port.UserRepositoryPort;
+import com.skax.eatool.user.domain.UserStatistics;
 
 import java.util.List;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 @Slf4j
 @Service
@@ -137,7 +128,7 @@ public class UserService implements UserServicePort {
     public User update(User user) {
         log.info("[UserService.update START]");
         User existingUser = userRepositoryPort.findById(user.getId())
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ELEMENT));
 
         User updatedUser = existingUser.updateUser(user, passwordEncoder);
         User result = userRepositoryPort.save(updatedUser);
@@ -231,5 +222,30 @@ public class UserService implements UserServicePort {
 
         log.info("[UserService.searchUsers END] - found: {}", result.getTotalElements());
         return result;
+    }
+
+    /**
+     * 사용자 통계 정보 조회
+     */
+    public UserStatistics getUserStatistics() {
+        log.info("[UserService.getUserStatistics START]");
+
+        long totalUsers = userRepositoryPort.findAll().size();
+        long activeUsers = userRepositoryPort.countByStatus(com.skax.eatool.user.domain.UserStatus.ACTIVE);
+        long adminUsers = userRepositoryPort.countByUserType("ADMIN");
+        long todayLoginUsers = userRepositoryPort.countTodayLoginUsers();
+
+        UserStatistics statistics = UserStatistics.builder()
+                .totalUsers(totalUsers)
+                .activeUsers(activeUsers)
+                .adminUsers(adminUsers)
+                .todayLoginUsers(todayLoginUsers)
+                .serviceStatus("정상")
+                .build();
+
+        log.info("[UserService.getUserStatistics END] - total: {}, active: {}, admin: {}",
+                totalUsers, activeUsers, adminUsers);
+
+        return statistics;
     }
 }

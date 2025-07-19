@@ -104,7 +104,7 @@ public class TXBLXMLconfig {
   public static long otxctlmode = 0;
   public static long ntxctlmode = 0;
   public static String xml_file_name = TCFConstants.TX_BLOCKING_CONFIG_FILE_NAME;
-  public static Hashtable ht = new Hashtable();
+  public static Hashtable<String, String> ht = new Hashtable<>();
   public EPlatonEvent in;
 
   @Autowired
@@ -174,8 +174,8 @@ public class TXBLXMLconfig {
         String tellE = GetEnvValue("TRANSACTION-BLOCKING", "TELLER", "TELLE" + ii);
         ht.put("TELLS" + ii, tellS != null ? tellS : "*");
         ht.put("TELLE" + ii, tellE != null ? tellE : "*");
-        System.out.println((String) ht.get("TELLS" + ii));
-        System.out.println((String) ht.get("TELLE" + ii));
+        System.out.println(ht.get("TELLS" + ii));
+        System.out.println(ht.get("TELLE" + ii));
       }
 
       String eMode = GetEnvValue("TRANSACTION-BLOCKING", "TXCODE", "EMODE");
@@ -189,8 +189,8 @@ public class TXBLXMLconfig {
         String evntE = GetEnvValue("TRANSACTION-BLOCKING", "TXCODE", "EVNTE" + ii);
         ht.put("EVNTS" + ii, evntS != null ? evntS : "*");
         ht.put("EVNTE" + ii, evntE != null ? evntE : "*");
-        System.out.println((String) ht.get("EVNTS" + ii));
-        System.out.println((String) ht.get("EVNTE" + ii));
+        System.out.println(ht.get("EVNTS" + ii));
+        System.out.println(ht.get("EVNTE" + ii));
       }
 
       String bMode = GetEnvValue("TRANSACTION-BLOCKING", "BRANCH", "BMODE");
@@ -204,8 +204,8 @@ public class TXBLXMLconfig {
         String brchE = GetEnvValue("TRANSACTION-BLOCKING", "BRANCH", "BRCHE" + ii);
         ht.put("BRCHS" + ii, brchS != null ? brchS : "*");
         ht.put("BRCHE" + ii, brchE != null ? brchE : "*");
-        System.out.println((String) ht.get("BRCHS" + ii));
-        System.out.println((String) ht.get("BRCHE" + ii));
+        System.out.println(ht.get("BRCHS" + ii));
+        System.out.println(ht.get("BRCHE" + ii));
       }
 
       logger.info("==================[TXBLXMLconfig.initializeConfig END]");
@@ -263,15 +263,15 @@ public class TXBLXMLconfig {
 
     updateTxCtlInfo();
 
-    if ((ht.get("TMODE").toString().substring(0, 2)).equals("ON")) {
-      for (int ii = 1; ii <= CommonUtil.Str2Int((String) ht.get("TXBLOCKCNT")); ii++) {
+    if ((ht.get("TMODE").substring(0, 2)).equals("ON")) {
+      for (int ii = 1; ii <= CommonUtil.Str2Int(ht.get("TXBLOCKCNT")); ii++) {
         System.out.println("TELLS" + ii + ":" + ht.get("TELLS" + ii));
         System.out.println("TELLE" + ii + ":" + ht.get("TELLE" + ii));
 
-        if (((String) ht.get("TELLS" + ii)).equals("*") || ht.get("TELLS" + ii) == null)
+        if ((ht.get("TELLS" + ii)).equals("*") || ht.get("TELLS" + ii) == null)
           continue;
-        int st = CommonUtil.Str2Int((String) ht.get("TELLS" + ii));
-        int et = CommonUtil.Str2Int((String) ht.get("TELLE" + ii));
+        int st = CommonUtil.Str2Int(ht.get("TELLS" + ii));
+        int et = CommonUtil.Str2Int(ht.get("TELLE" + ii));
         int ct = CommonUtil.Str2Int(tellerid.substring(3, 10));
 
         System.out.println("CurrentTellerid:" + CommonUtil.Str2Int(tellerid.substring(3, 10)));
@@ -283,15 +283,15 @@ public class TXBLXMLconfig {
           return true;
         }
       }
-    } else if ((ht.get("EMODE").toString().substring(0, 2)).equals("ON")) {
-      for (int ii = 1; ii <= CommonUtil.Str2Int((String) ht.get("TXBLOCKCNT")); ii++) {
+    } else if ((ht.get("EMODE").substring(0, 2)).equals("ON")) {
+      for (int ii = 1; ii <= CommonUtil.Str2Int(ht.get("TXBLOCKCNT")); ii++) {
         System.out.println("EVNTS" + ii + ":" + ht.get("EVNTS" + ii));
         System.out.println("EVNTE" + ii + ":" + ht.get("EVNTE" + ii));
 
-        if (((String) ht.get("EVNTS" + ii)).equals("*") || ht.get("EVNTS" + ii) == null)
+        if ((ht.get("EVNTS" + ii)).equals("*") || ht.get("EVNTS" + ii) == null)
           continue;
-        int st = CommonUtil.Str2Int((String) ht.get("EVNTS" + ii));
-        int et = CommonUtil.Str2Int((String) ht.get("EVNTE" + ii));
+        int st = CommonUtil.Str2Int(ht.get("EVNTS" + ii));
+        int et = CommonUtil.Str2Int(ht.get("EVNTE" + ii));
         int ct = CommonUtil.Str2Int(eventno);
 
         System.out.println("CurrentEvent:" + eventno);
@@ -307,15 +307,15 @@ public class TXBLXMLconfig {
           return true;
         }
       }
-    } else if ((ht.get("BMODE").toString().substring(0, 2)).equals("ON")) {
-      for (int ii = 1; ii <= CommonUtil.Str2Int((String) ht.get("TXBLOCKCNT")); ii++) {
+    } else if ((ht.get("BMODE").substring(0, 2)).equals("ON")) {
+      for (int ii = 1; ii <= CommonUtil.Str2Int(ht.get("TXBLOCKCNT")); ii++) {
         System.out.println("BRCHS" + ii + ":" + ht.get("BRCHS" + ii));
         System.out.println("BRCHE" + ii + ":" + ht.get("BRCHE" + ii));
 
-        if (((String) ht.get("BRCHS" + ii)).equals("*") || ht.get("BRCHS" + ii) == null)
+        if ((ht.get("BRCHS" + ii)).equals("*") || ht.get("BRCHS" + ii) == null)
           continue;
-        int st = CommonUtil.Str2Int((String) ht.get("BRCHS" + ii));
-        int et = CommonUtil.Str2Int((String) ht.get("BRCHE" + ii));
+        int st = CommonUtil.Str2Int(ht.get("BRCHS" + ii));
+        int et = CommonUtil.Str2Int(ht.get("BRCHE" + ii));
         int ct = CommonUtil.Str2Int(branch);
 
         System.out.println("Currentbranch:" + CommonUtil.Str2Int(branch));

@@ -199,6 +199,48 @@ INSERT INTO hot_card (card_number, sequence_no, primary_account_no, cif_no, cif_
 ('1234567890123471', 2, '110123456804', 'CIF016', '이해지', 'H', '20240102', 'SYSTEM', 'Second hot card registration - unauthorized usage');
 
 -- ========================================
+-- 7. USER ACTIVITIES TABLE DATA (사용자 활동 로그 데이터)
+-- ========================================
+INSERT INTO user_activities (user_id, activity_type, description, ip_address, user_agent, session_id, status, processing_time, additional_info, timestamp) VALUES
+-- Login Activities (로그인 활동)
+('USER001', 'LOGIN', '사용자 로그인 성공', '192.168.1.100', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'SESS001', 'SUCCESS', 150, '{"loginAttempt": 1}', '2024-01-15 09:30:00'),
+('USER002', 'LOGIN', '사용자 로그인 성공', '192.168.1.101', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36', 'SESS002', 'SUCCESS', 120, '{"loginAttempt": 1}', '2024-01-15 10:15:00'),
+('USER003', 'LOGIN', '사용자 로그인 성공', '192.168.1.102', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'SESS003', 'SUCCESS', 180, '{"loginAttempt": 1}', '2024-01-15 11:00:00'),
+('ADMIN001', 'LOGIN', '관리자 로그인 성공', '192.168.1.200', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'SESS004', 'SUCCESS', 90, '{"loginAttempt": 1, "adminAccess": true}', '2024-01-15 08:00:00'),
+('USER004', 'LOGIN', '사용자 로그인 실패', '192.168.1.103', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'SESS005', 'FAILED', 200, '{"loginAttempt": 3, "reason": "invalid_password"}', '2024-01-15 12:30:00'),
+
+-- Logout Activities (로그아웃 활동)
+('USER001', 'LOGOUT', '사용자 로그아웃', '192.168.1.100', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'SESS001', 'SUCCESS', 50, '{"logoutReason": "user_request"}', '2024-01-15 17:30:00'),
+('USER002', 'LOGOUT', '사용자 로그아웃', '192.168.1.101', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36', 'SESS002', 'SUCCESS', 45, '{"logoutReason": "session_timeout"}', '2024-01-15 18:00:00'),
+('ADMIN001', 'LOGOUT', '관리자 로그아웃', '192.168.1.200', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'SESS004', 'SUCCESS', 40, '{"logoutReason": "user_request"}', '2024-01-15 19:00:00'),
+
+-- User Management Activities (사용자 관리 활동)
+('ADMIN001', 'CREATE', '새 사용자 등록: USER011', '192.168.1.200', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'SESS004', 'SUCCESS', 300, '{"operation": "user_registration", "newUserId": "USER011"}', '2024-01-15 14:00:00'),
+('ADMIN001', 'UPDATE', '사용자 정보 수정: USER001', '192.168.1.200', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'SESS004', 'SUCCESS', 250, '{"operation": "user_update", "userId": "USER001", "field": "email"}', '2024-01-15 15:30:00'),
+('ADMIN002', 'DELETE', '사용자 삭제: USER011', '192.168.1.201', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'SESS006', 'SUCCESS', 200, '{"operation": "user_deletion", "userId": "USER011"}', '2024-01-15 16:00:00'),
+
+-- Cash Card Activities (현금카드 활동)
+('USER001', 'CREATE', '현금카드 발급: 1234567890123456', '192.168.1.100', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'SESS001', 'SUCCESS', 500, '{"operation": "card_issuance", "cardNumber": "1234567890123456"}', '2024-01-15 13:00:00'),
+('USER002', 'UPDATE', '현금카드 한도 변경: 1234567890123457', '192.168.1.101', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36', 'SESS002', 'SUCCESS', 350, '{"operation": "limit_change", "cardNumber": "1234567890123457", "newLimit": 2000000}', '2024-01-15 14:30:00'),
+('ADMIN001', 'DELETE', '현금카드 정지: 1234567890123470', '192.168.1.200', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'SESS004', 'SUCCESS', 400, '{"operation": "card_suspension", "cardNumber": "1234567890123470", "reason": "lost_card"}', '2024-01-15 15:00:00'),
+
+-- Deposit Activities (예금 활동)
+('USER003', 'CREATE', '예금계좌 개설: 110123456789', '192.168.1.102', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'SESS003', 'SUCCESS', 600, '{"operation": "account_opening", "accountNumber": "110123456789", "type": "savings"}', '2024-01-15 11:30:00'),
+('USER004', 'UPDATE', '예금계좌 정보 수정: 110123456790', '192.168.1.103', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'SESS005', 'SUCCESS', 280, '{"operation": "account_update", "accountNumber": "110123456790", "field": "interest_rate"}', '2024-01-15 12:00:00'),
+
+-- System Activities (시스템 활동)
+('SYSTEM', 'SYSTEM', '데이터베이스 백업 완료', '192.168.1.1', 'System Process', 'SYS001', 'SUCCESS', 5000, '{"operation": "database_backup", "size": "2.5GB"}', '2024-01-15 02:00:00'),
+('SYSTEM', 'SYSTEM', '로그 정리 작업 완료', '192.168.1.1', 'System Process', 'SYS002', 'SUCCESS', 1200, '{"operation": "log_cleanup", "deletedCount": 1000}', '2024-01-15 03:00:00'),
+('SYSTEM', 'SYSTEM', '시스템 점검 완료', '192.168.1.1', 'System Process', 'SYS003', 'SUCCESS', 800, '{"operation": "system_check", "status": "healthy"}', '2024-01-15 04:00:00'),
+
+-- Recent Activities (최근 활동들)
+('USER005', 'LOGIN', '사용자 로그인 성공', '192.168.1.104', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'SESS007', 'SUCCESS', 110, '{"loginAttempt": 1}', NOW() - INTERVAL 1 HOUR),
+('USER006', 'LOGIN', '사용자 로그인 성공', '192.168.1.105', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36', 'SESS008', 'SUCCESS', 95, '{"loginAttempt": 1}', NOW() - INTERVAL 30 MINUTE),
+('USER007', 'UPDATE', '프로필 정보 수정', '192.168.1.106', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'SESS009', 'SUCCESS', 180, '{"operation": "profile_update", "field": "phone"}', NOW() - INTERVAL 15 MINUTE),
+('ADMIN002', 'CREATE', '새 텔러 등록: TELLER014', '192.168.1.201', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'SESS006', 'SUCCESS', 320, '{"operation": "teller_registration", "tellerId": "TELLER014"}', NOW() - INTERVAL 10 MINUTE),
+('USER008', 'LOGOUT', '사용자 로그아웃', '192.168.1.107', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'SESS010', 'SUCCESS', 35, '{"logoutReason": "user_request"}', NOW() - INTERVAL 5 MINUTE);
+
+-- ========================================
 -- 7. TRANSACTION LOG TABLE DATA (거래 로그 데이터)
 -- ========================================
 INSERT INTO transaction_log (transaction_id, transaction_no, host_name, system_name, method_name, bank_code, branch_code, user_id, channel_type, business_date, register_date, in_time, out_time, response_time, error_code, event_no, ip_address) VALUES

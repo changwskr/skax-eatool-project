@@ -253,3 +253,25 @@ CREATE INDEX IF NOT EXISTS idx_tech_spec_category ON tech_spec(category);
 CREATE INDEX IF NOT EXISTS idx_tech_spec_sub_item ON tech_spec(sub_item);
 CREATE INDEX IF NOT EXISTS idx_tech_spec_technology_name ON tech_spec(technology_name);
 CREATE INDEX IF NOT EXISTS idx_tech_spec_is_active ON tech_spec(is_active); 
+
+-- 사용자 활동 로그 테이블
+CREATE TABLE IF NOT EXISTS user_activities (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id VARCHAR(100) NOT NULL,
+    activity_type VARCHAR(50) NOT NULL,
+    description TEXT,
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    session_id VARCHAR(255),
+    status VARCHAR(20) DEFAULT 'SUCCESS',
+    processing_time BIGINT,
+    additional_info TEXT,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_modified_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_user_id (user_id),
+    INDEX idx_activity_type (activity_type),
+    INDEX idx_status (status),
+    INDEX idx_timestamp (timestamp),
+    INDEX idx_ip_address (ip_address)
+); 

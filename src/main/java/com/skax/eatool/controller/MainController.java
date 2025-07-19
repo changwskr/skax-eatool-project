@@ -8,6 +8,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.skax.eatool.user.service.UserService;
+import com.skax.eatool.user.domain.UserStatistics;
 
 /**
  * SKCC Oversea 메인 컨트롤러
@@ -18,6 +21,9 @@ import org.slf4j.LoggerFactory;
 public class MainController {
 
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
+
+    @Autowired
+    private UserService userService;
 
     /**
      * 메인 페이지 - 인증 상태에 따라 다른 페이지 또는 로그인 페이지로 리다이렉트
@@ -111,6 +117,16 @@ public class MainController {
             model.addAttribute("title", "User Management");
             model.addAttribute("serviceName", "User");
             model.addAttribute("description", "사용자 관리 및 인증 서비스");
+
+            // 사용자 통계 데이터 가져오기
+            UserStatistics userStatistics = userService.getUserStatistics();
+            model.addAttribute("userStatistics", userStatistics);
+            model.addAttribute("totalUsers", userStatistics.getTotalUsers());
+            model.addAttribute("activeUsers", userStatistics.getActiveUsers());
+            model.addAttribute("adminUsers", userStatistics.getAdminUsers());
+            model.addAttribute("todayLoginUsers", userStatistics.getTodayLoginUsers());
+            model.addAttribute("serviceStatus", userStatistics.getServiceStatus());
+
             logger.info("==================[MainController.userPage END]");
             return "service/user";
         } catch (Exception e) {

@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.skax.eatool.user.infrastructure.mybatis.UserActivityRepositoryMybatis">
+
+    <!-- 기본 CRUD 쿼리들 -->
+    <insert id="save" parameterType="com.skax.eatool.user.infrastructure.mybatis.UserActivityDto" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_activities (
+            user_id, activity_type, description, ip_address, user_agent, 
+            session_id, status, processing_time, additional_info, timestamp, 
+            created_date, last_modified_date
+        ) VALUES (
+            #{userId}, #{activityType}, #{description}, #{ipAddress}, #{userAgent},
+            #{sessionId}, #{status}, #{processingTime}, #{additionalInfo}, #{timestamp},
+            #{createdDate}, #{lastModifiedDate}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.skax.eatool.user.infrastructure.mybatis.UserActivityDto">
+        UPDATE user_activities SET
+            user_id = #{userId},
+            activity_type = #{activityType},
+            description = #{description},
+            ip_address = #{ipAddress},
+            user_agent = #{userAgent},
+            session_id = #{sessionId},
+            status = #{status},
+            processing_time = #{processingTime},
+            additional_info = #{additionalInfo},
+            timestamp = #{timestamp},
+            last_modified_date = #{lastModifiedDate}
+        WHERE id = #{id}
+    </update>
+
+    <select id="findById" resultType="com.skax.eatool.user.infrastructure.mybatis.UserActivityDto">
+        SELECT * FROM user_activities WHERE id = #{id}
+    </select>
+
+    <select id="findAll" resultType="com.skax.eatool.user.infrastructure.mybatis.UserActivityDto">
+        SELECT * FROM user_activities ORDER BY timestamp DESC
+    </select>
+
+    <select id="findAllWithPageable" resultType="com.skax.eatool.user.infrastructure.mybatis.UserActivityDto">
+        SELECT * FROM user_activities 
+        ORDER BY timestamp DESC 
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*) FROM user_activities
+    </select>
+
+    <!-- 사용자별 조회 쿼리들 -->
+    <select id="findByUserId" resultType="com.skax.eatool.user.infrastructure.mybatis.UserActivityDto">
+        SELECT * FROM user_activities 
+        WHERE user_id = #{userId} 
+        ORDER BY timestamp DESC
+    </select>
+
+    <select id="findByUserIdWithPageable" resultType="com.skax.eatool.user.infrastructure.mybatis.UserActivityDto">
+        SELECT * FROM user_activities 
+        WHERE user_id = #{userId} 
+        ORDER BY timestamp DESC 
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="countByUserId" resultType="long">
+        SELECT COUNT(*) FROM user_activities WHERE user_id = #{userId}
+    </select>
+
+    <!-- 활동 타입별 조회 -->
+    <select id="findByActivityType" resultType="com.skax.eatool.user.infrastructure.mybatis.UserActivityDto">
+        SELECT * FROM user_activities 
+        WHERE activity_type = #{activityType} 
+        ORDER BY timestamp DESC
+    </select>
+
+    <!-- 상태별 조회 -->
+    <select id="findByStatus" resultType="com.skax.eatool.user.infrastructure.mybatis.UserActivityDto">
+        SELECT * FROM user_activities 
+        WHERE status = #{status} 
+        ORDER BY timestamp DESC
+    </select>
+
+    <!-- IP 주소별 조회 -->
+    <select id="findByIpAddress" resultType="com.skax.eatool.user.infrastructure.mybatis.UserActivityDto">
+        SELECT * FROM user_activities 
+        WHERE ip_address = #{ipAddress} 
+        ORDER BY timestamp DESC
+    </select>
+
+    <!-- 날짜 범위별 조회 -->
+    <select id="findByTimestampBetween" resultType="com.skax.eatool.user.infrastructure.mybatis.UserActivityDto">
+        SELECT * FROM user_activities 
+        WHERE timestamp BETWEEN #{startDate} AND #{endDate} 
+        ORDER BY timestamp DESC
+    </select>
+
+    <!-- 사용자 ID와 날짜 범위별 조회 -->
+    <select id="findByUserIdAndTimestampBetween" resultType="com.skax.eatool.user.infrastructure.mybatis.UserActivityDto">
+        SELECT * FROM user_activities 
+        WHERE user_id = #{userId} 
+        AND timestamp BETWEEN #{startDate} AND #{endDate} 
+        ORDER BY timestamp DESC
+    </select>
+
+    <!-- 고급 검색 쿼리 -->
+    <select id="findByAdvancedSearch" resultType="com.skax.eatool.user.infrastructure.mybatis.UserActivityDto">
+        SELECT * FROM user_activities 
+        <where>
+            <if test="userId != null and userId != ''">
+                AND user_id = #{userId}
+            </if>
+            <if test="activityType != null and activityType != ''">
+                AND activity_type = #{activityType}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="ipAddress != null and ipAddress != ''">
+                AND ip_address = #{ipAddress}
+            </if>
+            <if test="startDate != null">
+                AND timestamp >= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND timestamp <= #{endDate}
+            </if>
+        </where>
+        ORDER BY timestamp DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+
+    <!-- 고급 검색 결과 수 조회 -->
+    <select id="countByAdvancedSearch" resultType="long">
+        SELECT COUNT(*) FROM user_activities 
+        <where>
+            <if test="userId != null and userId != ''">
+                AND user_id = #{userId}
+            </if>
+            <if test="activityType != null and activityType != ''">
+                AND activity_type = #{activityType}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="ipAddress != null and ipAddress != ''">
+                AND ip_address = #{ipAddress}
+            </if>
+            <if test="startDate != null">
+                AND timestamp >= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND timestamp <= #{endDate}
+            </if>
+        </where>
+    </select>
+
+    <!-- 활동 타입별 통계 -->
+    <select id="getActivityTypeStatistics" resultType="java.util.Map">
+        SELECT 
+            activity_type as activityType,
+            COUNT(*) as count,
+            COUNT(CASE WHEN status = 'SUCCESS' THEN 1 END) as successCount,
+            COUNT(CASE WHEN status = 'FAILED' THEN 1 END) as failedCount
+        FROM user_activities 
+        WHERE timestamp >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+        GROUP BY activity_type
+        ORDER BY count DESC
+    </select>
+
+    <!-- 시간대별 활동 통계 -->
+    <select id="getHourlyStatistics" resultType="java.util.Map">
+        SELECT 
+            HOUR(timestamp) as hour,
+            COUNT(*) as count
+        FROM user_activities 
+        WHERE timestamp >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+        GROUP BY HOUR(timestamp)
+        ORDER BY hour
+    </select>
+
+    <!-- 최근 활동 조회 -->
+    <select id="findRecentActivities" resultType="com.skax.eatool.user.infrastructure.mybatis.UserActivityDto">
+        SELECT * FROM user_activities 
+        ORDER BY timestamp DESC 
+        LIMIT #{limit}
+    </select>
+
+    <!-- 통계 쿼리들 -->
+    <select id="countTodayActivities" resultType="long">
+        SELECT COUNT(*) FROM user_activities 
+        WHERE DATE(timestamp) = CURDATE()
+    </select>
+
+    <select id="countThisWeekActivities" resultType="long">
+        SELECT COUNT(*) FROM user_activities 
+        WHERE YEARWEEK(timestamp) = YEARWEEK(NOW())
+    </select>
+
+    <select id="countFailedLogs" resultType="long">
+        SELECT COUNT(*) FROM user_activities 
+        WHERE status = 'FAILED'
+    </select>
+
+    <select id="countActiveUsers" resultType="long">
+        SELECT COUNT(DISTINCT user_id) FROM user_activities 
+        WHERE activity_type = 'LOGIN' 
+        AND status = 'SUCCESS' 
+        AND DATE(timestamp) = CURDATE()
+    </select>
+
+    <!-- 삭제 쿼리들 -->
+    <delete id="deleteById">
+        DELETE FROM user_activities WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteOldActivities">
+        DELETE FROM user_activities 
+        WHERE timestamp < DATE_SUB(NOW(), INTERVAL 30 DAY)
+    </delete>
+
+</mapper> 

@@ -23,8 +23,8 @@ public class UserActivityEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @Column(name = "user_id", nullable = false, length = 100)
+    private String userId;
 
     @Column(name = "activity_type", nullable = false, length = 50)
     private String activityType;
@@ -38,8 +38,8 @@ public class UserActivityEntity extends BaseEntity {
     @Column(name = "user_agent", length = 500)
     private String userAgent;
 
-    @Column(name = "activity_time", nullable = false)
-    private LocalDateTime activityTime;
+    @Column(name = "timestamp", nullable = false)
+    private LocalDateTime timestamp;
 
     @Column(name = "status", length = 20, nullable = false)
     private String status;
@@ -53,7 +53,7 @@ public class UserActivityEntity extends BaseEntity {
                 .description(this.description)
                 .ipAddress(this.ipAddress)
                 .userAgent(this.userAgent)
-                .activityTime(this.activityTime)
+                .timestamp(this.timestamp)
                 .status(this.status)
                 .build();
     }
@@ -67,7 +67,7 @@ public class UserActivityEntity extends BaseEntity {
                 .description(userActivity.getDescription())
                 .ipAddress(userActivity.getIpAddress())
                 .userAgent(userActivity.getUserAgent())
-                .activityTime(userActivity.getActivityTime())
+                .timestamp(userActivity.getTimestamp())
                 .status(userActivity.getStatus())
                 .build();
     }

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.skax.eatool.user.infrastructure.mybatis.UserRepositoryMybatis">
+
+    <!-- 기본 CRUD 쿼리들 -->
+    <select id="findById" resultType="com.skax.eatool.user.infrastructure.mybatis.UserDto">
+        SELECT * FROM users WHERE id = #{id}
+    </select>
+
+    <select id="findByEmail" resultType="com.skax.eatool.user.infrastructure.mybatis.UserDto">
+        SELECT * FROM users WHERE email = #{email}
+    </select>
+
+    <insert id="save" parameterType="com.skax.eatool.user.infrastructure.mybatis.UserDto" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO users (email, username, user_id, address, job, age, company, name, phone, department, position, user_type, password, status, created_date, last_modified_date)
+        VALUES (#{email}, #{username}, #{userId}, #{address}, #{job}, #{age}, #{company}, #{name}, #{phone}, #{department}, #{position}, #{userType}, #{password}, #{status}, #{createdDate}, #{lastModifiedDate})
+    </insert>
+
+    <select id="findAll" resultType="com.skax.eatool.user.infrastructure.mybatis.UserDto">
+        SELECT * FROM users ORDER BY id
+    </select>
+
+    <select id="findAllWithPageable" resultType="com.skax.eatool.user.infrastructure.mybatis.UserDto">
+        SELECT * FROM users ORDER BY id LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*) FROM users
+    </select>
+
+    <!-- 통계 조회 쿼리들 -->
+    <select id="countByStatus" resultType="long">
+        SELECT COUNT(*) FROM users WHERE status = #{status}
+    </select>
+
+    <select id="countByUserType" resultType="long">
+        SELECT COUNT(*) FROM users WHERE user_type = #{userType}
+    </select>
+
+    <select id="countTodayLoginUsers" resultType="long">
+        SELECT COUNT(*) FROM users 
+        WHERE DATE(last_modified_date) = CURDATE() 
+        AND status = 'ACTIVE'
+    </select>
+
+</mapper> 

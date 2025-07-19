@@ -319,22 +319,22 @@ public class CommonUtil {
   }
 
   public static final String Int2Str(int n) {
-    String s = new Integer(n).toString();
+    String s = String.valueOf(n);
     return (s);
   }
 
   public static final String Float2Str(float n) {
-    String s1 = new Float(n).toString();
+    String s1 = String.valueOf(n);
     return (s1);
   }
 
   public static final String Long2Str(long l) {
-    String s = new Long(l).toString();
+    String s = String.valueOf(l);
     return (s);
   }
 
   public static final String Double2Str(double d) {
-    String s = new Double(d).toString();
+    String s = String.valueOf(d);
     return (s);
   }
 
@@ -353,7 +353,7 @@ public class CommonUtil {
   }
 
   public static final String Char2Str(char ch) {
-    String lo = new Character(ch).toString();
+    String lo = String.valueOf(ch);
     return (lo);
   }
 
@@ -663,12 +663,12 @@ public class CommonUtil {
 
     Calendar c = Calendar.getInstance();
 
-    String yyyy = new Integer(c.get(Calendar.YEAR)).toString();
-    String mm = new Integer(c.get(Calendar.MONTH) + 1).toString();
-    String dd = new Integer(c.get(Calendar.DATE)).toString();
-    String hr = new Integer(c.get(Calendar.HOUR)).toString();
-    String min = new Integer(c.get(Calendar.MINUTE)).toString();
-    String sec = new Integer(c.get(Calendar.SECOND)).toString();
+    String yyyy = String.valueOf(c.get(Calendar.YEAR));
+    String mm = String.valueOf(c.get(Calendar.MONTH) + 1);
+    String dd = String.valueOf(c.get(Calendar.DATE));
+    String hr = String.valueOf(c.get(Calendar.HOUR));
+    String min = String.valueOf(c.get(Calendar.MINUTE));
+    String sec = String.valueOf(c.get(Calendar.SECOND));
 
     if (mm.trim().length() == 1) {
       mm = "0" + mm;
@@ -918,7 +918,7 @@ public class CommonUtil {
         LOG_FILE = value;
       }
       if ((value = p.getProperty(PARAM_PORT_NUMBER)) != null) {
-        PORT_NUMBER = new Integer(value).intValue();
+        PORT_NUMBER = Integer.parseInt(value);
       }
     } catch (Exception e) {
       e.printStackTrace();

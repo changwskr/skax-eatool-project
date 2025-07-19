@@ -1,6 +1,7 @@
 package com.skax.eatool.eplatonframework.transfer;
 
 import java.util.*;
+import java.util.Map;
 
 import com.skax.eatool.framework.transfer.*;
 
@@ -31,7 +32,7 @@ import com.skax.eatool.framework.transaction.constant.TCFConstants;
  */
 
 public class TPSVCINFODTO extends DTO {
-  private HashMap tpmsvcinfolist;
+  private HashMap<String, Object> tpmsvcinfolist;
   private String reqName;
   private String system_name; // CashCard
                               // EPlatonBizDelegateSB에서
@@ -151,7 +152,7 @@ public class TPSVCINFODTO extends DTO {
     return tpfq;
   }
 
-  public HashMap getTpmsvcinfolist() {
+  public HashMap<String, Object> getTpmsvcinfolist() {
     return tpmsvcinfolist;
   }
 
@@ -199,7 +200,7 @@ public class TPSVCINFODTO extends DTO {
     this.trclass = trclass;
   }
 
-  public void setTpmsvcinfolist(HashMap tpmsvcinfolist) {
+  public void setTpmsvcinfolist(HashMap<String, Object> tpmsvcinfolist) {
     this.tpmsvcinfolist = tpmsvcinfolist;
   }
 
@@ -247,14 +248,14 @@ public class TPSVCINFODTO extends DTO {
     this.cdto_name = cdto_name;
   }
 
-  public ArrayList getAllTPMSVCINFO() {
+  public ArrayList<TPMSVCINFO> getAllTPMSVCINFO() {
     if (tpmsvcinfolist == null)
-      tpmsvcinfolist = new HashMap();
+      tpmsvcinfolist = new HashMap<>();
 
-    Set set = tpmsvcinfolist.keySet();
-    Iterator it = set.iterator();
+    Set<String> set = tpmsvcinfolist.keySet();
+    Iterator<String> it = set.iterator();
 
-    ArrayList al = new ArrayList();
+    ArrayList<TPMSVCINFO> al = new ArrayList<>();
     while (it.hasNext()) {
       Object obj = tpmsvcinfolist.get(it.next());
       // System.out.println("---------:" + obj.getClass().getName());
@@ -278,27 +279,28 @@ public class TPSVCINFODTO extends DTO {
    * 
    * @return TPMSVCINFO object??collection
    */
-  public ArrayList getTotalTPMSVCINFO() {
-    if (tpmsvcinfolist == (HashMap) null)
-      tpmsvcinfolist = new HashMap();
+  public ArrayList<Map.Entry<String, Object>> getTotalTPMSVCINFO() {
+    if (tpmsvcinfolist == null)
+      tpmsvcinfolist = new HashMap<>();
 
-    Set set = tpmsvcinfolist.entrySet();
-    ArrayList al = new ArrayList(set);
+    Set<Map.Entry<String, Object>> set = tpmsvcinfolist.entrySet();
+    ArrayList<Map.Entry<String, Object>> al = new ArrayList<>(set);
     return al;
   }
 
-  public ArrayList getTotalTPMSVCINFO(int kk) {
-    if (tpmsvcinfolist == (HashMap) null)
-      tpmsvcinfolist = new HashMap();
+  public ArrayList<Object> getTotalTPMSVCINFO(int kk) {
+    if (tpmsvcinfolist == null)
+      tpmsvcinfolist = new HashMap<>();
 
-    ArrayList al = (ArrayList) this.tpmsvcinfolist.values();
+    ArrayList<Object> al = new ArrayList<>(this.tpmsvcinfolist.values());
     return al;
   }
 
   public static void prnttpmsvcinfo(EPlatonEvent event) {
-    ArrayList al = event.getTPSVCINFODTO().getTotalTPMSVCINFO();
+    ArrayList<Map.Entry<String, Object>> al = event.getTPSVCINFODTO().getTotalTPMSVCINFO();
     for (int i = 0; i < al.size(); i++) {
-      TPMSVCINFO tm = (TPMSVCINFO) al.get(i);
+      Map.Entry<String, Object> entry = al.get(i);
+      TPMSVCINFO tm = (TPMSVCINFO) entry.getValue();
       LOGEJ.getInstance().printf(1, event,
           "| " + i + " " + tm.getCall_service_name()
               + " " + tm.getCall_tpm_in_time()
@@ -321,8 +323,8 @@ public class TPSVCINFODTO extends DTO {
       TPMSVCINFO ctpm = null;
       String key = null;
 
-      if (tpmsvcinfolist == (HashMap) null)
-        tpmsvcinfolist = new HashMap();
+      if (tpmsvcinfolist == null)
+        tpmsvcinfolist = new HashMap<>();
 
       if (tpmsvcinfo == null)
         return false;

@@ -34,6 +34,14 @@ spring:
     timeout: 240m
     store-type: none
 
+# MyBatis Configuration
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.skax.eatool.user.infrastructure.mybatis
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
 server:
   port: 8080
   servlet:

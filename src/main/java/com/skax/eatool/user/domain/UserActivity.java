@@ -1,64 +1,83 @@
 package com.skax.eatool.user.domain;
 
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
 
 /**
- * 사용자 활동 로그 도메인
+ * 사용자 활동 로그 도메인 모델
  */
-@Getter
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class UserActivity {
 
+    /**
+     * 활동 로그 ID
+     */
     private Long id;
-    private Long userId;
-    private String activityType; // LOGIN, LOGOUT, CREATE, UPDATE, DELETE, etc.
+
+    /**
+     * 사용자 ID
+     */
+    private String userId;
+
+    /**
+     * 활동 타입 (LOGIN, LOGOUT, CREATE, UPDATE, DELETE)
+     */
+    private String activityType;
+
+    /**
+     * 활동 설명
+     */
     private String description;
+
+    /**
+     * IP 주소
+     */
     private String ipAddress;
+
+    /**
+     * 사용자 에이전트
+     */
     private String userAgent;
-    private LocalDateTime activityTime;
-    private String status; // SUCCESS, FAILURE
 
-    public static UserActivity createLoginActivity(Long userId, String ipAddress, String userAgent) {
-        return UserActivity.builder()
-                .userId(userId)
-                .activityType("LOGIN")
-                .description("사용자 로그인")
-                .ipAddress(ipAddress)
-                .userAgent(userAgent)
-                .activityTime(LocalDateTime.now())
-                .status("SUCCESS")
-                .build();
-    }
+    /**
+     * 세션 ID
+     */
+    private String sessionId;
 
-    public static UserActivity createLogoutActivity(Long userId, String ipAddress, String userAgent) {
-        return UserActivity.builder()
-                .userId(userId)
-                .activityType("LOGOUT")
-                .description("사용자 로그아웃")
-                .ipAddress(ipAddress)
-                .userAgent(userAgent)
-                .activityTime(LocalDateTime.now())
-                .status("SUCCESS")
-                .build();
-    }
+    /**
+     * 활동 상태 (SUCCESS, FAILED, PENDING)
+     */
+    private String status;
 
-    public static UserActivity createUserActivity(Long userId, String activityType, String description,
-            String ipAddress, String userAgent) {
-        return UserActivity.builder()
-                .userId(userId)
-                .activityType(activityType)
-                .description(description)
-                .ipAddress(ipAddress)
-                .userAgent(userAgent)
-                .activityTime(LocalDateTime.now())
-                .status("SUCCESS")
-                .build();
-    }
+    /**
+     * 처리 시간 (밀리초)
+     */
+    private Long processingTime;
+
+    /**
+     * 추가 정보 (JSON 형태)
+     */
+    private String additionalInfo;
+
+    /**
+     * 활동 발생 시간
+     */
+    private LocalDateTime timestamp;
+
+    /**
+     * 생성 시간
+     */
+    private LocalDateTime createdDate;
+
+    /**
+     * 수정 시간
+     */
+    private LocalDateTime lastModifiedDate;
 }

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -23,161 +24,289 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserActivityRepositoryPortJpaImpl implements UserActivityRepositoryPort {
 
-    private final UserActivityRepositoryJpa userActivityRepositoryJpa;
+        private final UserActivityRepositoryJpa userActivityRepositoryJpa;
 
-    @Override
-    public UserActivity save(UserActivity userActivity) {
-        log.info("[UserActivityRepositoryPortJpaImpl] save START - userId: {}, activityType: {}",
-                userActivity.getUserId(), userActivity.getActivityType());
+        @Override
+        public UserActivity save(UserActivity userActivity) {
+                log.info("[UserActivityRepositoryPortJpaImpl] save START - userId: {}, activityType: {}",
+                                userActivity.getUserId(), userActivity.getActivityType());
 
-        UserActivityEntity entity = UserActivityEntity.fromDomain(userActivity);
-        UserActivityEntity savedEntity = userActivityRepositoryJpa.save(entity);
-        UserActivity result = savedEntity.toDomain();
+                UserActivityEntity entity = UserActivityEntity.fromDomain(userActivity);
+                UserActivityEntity savedEntity = userActivityRepositoryJpa.save(entity);
+                UserActivity result = savedEntity.toDomain();
 
-        log.info("[UserActivityRepositoryPortJpaImpl] save END - activityId: {}", result.getId());
-        return result;
-    }
+                log.info("[UserActivityRepositoryPortJpaImpl] save END - activityId: {}", result.getId());
+                return result;
+        }
 
-    @Override
-    public Optional<UserActivity> findById(Long id) {
-        log.info("[UserActivityRepositoryPortJpaImpl] findById START - id: {}", id);
+        @Override
+        public Optional<UserActivity> findById(Long id) {
+                log.info("[UserActivityRepositoryPortJpaImpl] findById START - id: {}", id);
 
-        Optional<UserActivity> result = userActivityRepositoryJpa.findById(id)
-                .map(UserActivityEntity::toDomain);
+                Optional<UserActivity> result = userActivityRepositoryJpa.findById(id)
+                                .map(UserActivityEntity::toDomain);
 
-        log.info("[UserActivityRepositoryPortJpaImpl] findById END - found: {}", result.isPresent());
-        return result;
-    }
+                log.info("[UserActivityRepositoryPortJpaImpl] findById END - found: {}", result.isPresent());
+                return result;
+        }
 
-    @Override
-    public List<UserActivity> findByUserId(Long userId) {
-        log.info("[UserActivityRepositoryPortJpaImpl] findByUserId START - userId: {}", userId);
+        @Override
+        public List<UserActivity> findAll() {
+                log.info("[UserActivityRepositoryPortJpaImpl] findAll START");
 
-        List<UserActivity> result = userActivityRepositoryJpa.findByUserIdOrderByActivityTimeDesc(userId)
-                .stream()
-                .map(UserActivityEntity::toDomain)
-                .collect(Collectors.toList());
+                List<UserActivity> result = userActivityRepositoryJpa.findAll()
+                                .stream()
+                                .map(UserActivityEntity::toDomain)
+                                .collect(Collectors.toList());
 
-        log.info("[UserActivityRepositoryPortJpaImpl] findByUserId END - count: {}", result.size());
-        return result;
-    }
+                log.info("[UserActivityRepositoryPortJpaImpl] findAll END - count: {}", result.size());
+                return result;
+        }
 
-    @Override
-    public Page<UserActivity> findByUserId(Long userId, Pageable pageable) {
-        log.info("[UserActivityRepositoryPortJpaImpl] findByUserId(Pageable) START - userId: {}, pageable: {}", userId,
-                pageable);
+        @Override
+        public Page<UserActivity> findAll(Pageable pageable) {
+                log.info("[UserActivityRepositoryPortJpaImpl] findAll(Pageable) START - pageable: {}", pageable);
 
-        Page<UserActivity> result = userActivityRepositoryJpa.findByUserIdOrderByActivityTimeDesc(userId, pageable)
-                .map(UserActivityEntity::toDomain);
+                Page<UserActivity> result = userActivityRepositoryJpa.findAll(pageable)
+                                .map(UserActivityEntity::toDomain);
 
-        log.info("[UserActivityRepositoryPortJpaImpl] findByUserId(Pageable) END - totalElements: {}",
-                result.getTotalElements());
-        return result;
-    }
+                log.info("[UserActivityRepositoryPortJpaImpl] findAll(Pageable) END - totalElements: {}",
+                                result.getTotalElements());
+                return result;
+        }
 
-    @Override
-    public List<UserActivity> findByActivityType(String activityType) {
-        log.info("[UserActivityRepositoryPortJpaImpl] findByActivityType START - activityType: {}", activityType);
+        @Override
+        public List<UserActivity> findByUserId(String userId) {
+                log.info("[UserActivityRepositoryPortJpaImpl] findByUserId START - userId: {}", userId);
 
-        List<UserActivity> result = userActivityRepositoryJpa.findByActivityTypeOrderByActivityTimeDesc(activityType)
-                .stream()
-                .map(UserActivityEntity::toDomain)
-                .collect(Collectors.toList());
+                List<UserActivity> result = userActivityRepositoryJpa.findByUserIdOrderByTimestampDesc(userId)
+                                .stream()
+                                .map(UserActivityEntity::toDomain)
+                                .collect(Collectors.toList());
 
-        log.info("[UserActivityRepositoryPortJpaImpl] findByActivityType END - count: {}", result.size());
-        return result;
-    }
+                log.info("[UserActivityRepositoryPortJpaImpl] findByUserId END - count: {}", result.size());
+                return result;
+        }
 
-    @Override
-    public List<UserActivity> findByActivityTimeBetween(LocalDateTime startDate, LocalDateTime endDate) {
-        log.info("[UserActivityRepositoryPortJpaImpl] findByActivityTimeBetween START - startDate: {}, endDate: {}",
-                startDate, endDate);
+        @Override
+        public Page<UserActivity> findByUserId(String userId, Pageable pageable) {
+                log.info("[UserActivityRepositoryPortJpaImpl] findByUserId(Pageable) START - userId: {}, pageable: {}",
+                                userId, pageable);
 
-        List<UserActivity> result = userActivityRepositoryJpa.findByActivityTimeBetween(startDate, endDate)
-                .stream()
-                .map(UserActivityEntity::toDomain)
-                .collect(Collectors.toList());
+                Page<UserActivity> result = userActivityRepositoryJpa.findByUserIdOrderByTimestampDesc(userId, pageable)
+                                .map(UserActivityEntity::toDomain);
 
-        log.info("[UserActivityRepositoryPortJpaImpl] findByActivityTimeBetween END - count: {}", result.size());
-        return result;
-    }
+                log.info("[UserActivityRepositoryPortJpaImpl] findByUserId(Pageable) END - totalElements: {}",
+                                result.getTotalElements());
+                return result;
+        }
 
-    @Override
-    public List<UserActivity> findByUserIdAndActivityTimeBetween(Long userId, LocalDateTime startDate,
-            LocalDateTime endDate) {
-        log.info(
-                "[UserActivityRepositoryPortJpaImpl] findByUserIdAndActivityTimeBetween START - userId: {}, startDate: {}, endDate: {}",
-                userId, startDate, endDate);
+        @Override
+        public List<UserActivity> findByActivityType(String activityType) {
+                log.info("[UserActivityRepositoryPortJpaImpl] findByActivityType START - activityType: {}",
+                                activityType);
 
-        List<UserActivity> result = userActivityRepositoryJpa
-                .findByUserIdAndActivityTimeBetween(userId, startDate, endDate)
-                .stream()
-                .map(UserActivityEntity::toDomain)
-                .collect(Collectors.toList());
+                List<UserActivity> result = userActivityRepositoryJpa
+                                .findByActivityTypeOrderByTimestampDesc(activityType)
+                                .stream()
+                                .map(UserActivityEntity::toDomain)
+                                .collect(Collectors.toList());
 
-        log.info("[UserActivityRepositoryPortJpaImpl] findByUserIdAndActivityTimeBetween END - count: {}",
-                result.size());
-        return result;
-    }
+                log.info("[UserActivityRepositoryPortJpaImpl] findByActivityType END - count: {}", result.size());
+                return result;
+        }
 
-    @Override
-    public List<UserActivity> findByIpAddress(String ipAddress) {
-        log.info("[UserActivityRepositoryPortJpaImpl] findByIpAddress START - ipAddress: {}", ipAddress);
+        @Override
+        public List<UserActivity> findByStatus(String status) {
+                log.info("[UserActivityRepositoryPortJpaImpl] findByStatus START - status: {}", status);
 
-        List<UserActivity> result = userActivityRepositoryJpa.findByIpAddressOrderByActivityTimeDesc(ipAddress)
-                .stream()
-                .map(UserActivityEntity::toDomain)
-                .collect(Collectors.toList());
+                List<UserActivity> result = userActivityRepositoryJpa.findByStatusOrderByTimestampDesc(status)
+                                .stream()
+                                .map(UserActivityEntity::toDomain)
+                                .collect(Collectors.toList());
 
-        log.info("[UserActivityRepositoryPortJpaImpl] findByIpAddress END - count: {}", result.size());
-        return result;
-    }
+                log.info("[UserActivityRepositoryPortJpaImpl] findByStatus END - count: {}", result.size());
+                return result;
+        }
 
-    @Override
-    public List<UserActivity> findByStatus(String status) {
-        log.info("[UserActivityRepositoryPortJpaImpl] findByStatus START - status: {}", status);
+        @Override
+        public List<UserActivity> findByIpAddress(String ipAddress) {
+                log.info("[UserActivityRepositoryPortJpaImpl] findByIpAddress START - ipAddress: {}", ipAddress);
 
-        List<UserActivity> result = userActivityRepositoryJpa.findByStatusOrderByActivityTimeDesc(status)
-                .stream()
-                .map(UserActivityEntity::toDomain)
-                .collect(Collectors.toList());
+                List<UserActivity> result = userActivityRepositoryJpa.findByIpAddressOrderByTimestampDesc(ipAddress)
+                                .stream()
+                                .map(UserActivityEntity::toDomain)
+                                .collect(Collectors.toList());
 
-        log.info("[UserActivityRepositoryPortJpaImpl] findByStatus END - count: {}", result.size());
-        return result;
-    }
+                log.info("[UserActivityRepositoryPortJpaImpl] findByIpAddress END - count: {}", result.size());
+                return result;
+        }
 
-    @Override
-    public List<UserActivity> findRecentActivities(Pageable pageable) {
-        log.info("[UserActivityRepositoryPortJpaImpl] findRecentActivities START - pageable: {}", pageable);
+        @Override
+        public List<UserActivity> findByTimestampBetween(LocalDateTime startDate, LocalDateTime endDate) {
+                log.info("[UserActivityRepositoryPortJpaImpl] findByTimestampBetween START - startDate: {}, endDate: {}",
+                                startDate, endDate);
 
-        List<UserActivity> result = userActivityRepositoryJpa.findRecentActivities(pageable)
-                .stream()
-                .map(UserActivityEntity::toDomain)
-                .collect(Collectors.toList());
+                List<UserActivity> result = userActivityRepositoryJpa.findByTimestampBetween(startDate, endDate)
+                                .stream()
+                                .map(UserActivityEntity::toDomain)
+                                .collect(Collectors.toList());
 
-        log.info("[UserActivityRepositoryPortJpaImpl] findRecentActivities END - count: {}", result.size());
-        return result;
-    }
+                log.info("[UserActivityRepositoryPortJpaImpl] findByTimestampBetween END - count: {}", result.size());
+                return result;
+        }
 
-    @Override
-    public List<UserActivity> findAll() {
-        log.info("[UserActivityRepositoryPortJpaImpl] findAll START");
+        @Override
+        public List<UserActivity> findByUserIdAndTimestampBetween(String userId, LocalDateTime startDate,
+                        LocalDateTime endDate) {
+                log.info("[UserActivityRepositoryPortJpaImpl] findByUserIdAndTimestampBetween START - userId: {}, startDate: {}, endDate: {}",
+                                userId, startDate, endDate);
 
-        List<UserActivity> result = userActivityRepositoryJpa.findAll()
-                .stream()
-                .map(UserActivityEntity::toDomain)
-                .collect(Collectors.toList());
+                List<UserActivity> result = userActivityRepositoryJpa
+                                .findByUserIdAndTimestampBetween(userId, startDate, endDate)
+                                .stream()
+                                .map(UserActivityEntity::toDomain)
+                                .collect(Collectors.toList());
 
-        log.info("[UserActivityRepositoryPortJpaImpl] findAll END - count: {}", result.size());
-        return result;
-    }
+                log.info("[UserActivityRepositoryPortJpaImpl] findByUserIdAndTimestampBetween END - count: {}",
+                                result.size());
+                return result;
+        }
 
-    @Override
-    public void deleteById(Long id) {
-        log.info("[UserActivityRepositoryPortJpaImpl] deleteById START - id: {}", id);
+        @Override
+        public List<UserActivity> findRecentActivities(Pageable pageable) {
+                log.info("[UserActivityRepositoryPortJpaImpl] findRecentActivities START - pageable: {}", pageable);
 
-        userActivityRepositoryJpa.deleteById(id);
+                List<UserActivity> result = userActivityRepositoryJpa.findRecentActivities(pageable)
+                                .stream()
+                                .map(UserActivityEntity::toDomain)
+                                .collect(Collectors.toList());
 
-        log.info("[UserActivityRepositoryPortJpaImpl] deleteById END - id: {}", id);
-    }
+                log.info("[UserActivityRepositoryPortJpaImpl] findRecentActivities END - count: {}", result.size());
+                return result;
+        }
+
+        @Override
+        public long countTodayActivities() {
+                log.info("[UserActivityRepositoryPortJpaImpl] countTodayActivities START");
+
+                long result = userActivityRepositoryJpa.countTodayActivities();
+
+                log.info("[UserActivityRepositoryPortJpaImpl] countTodayActivities END - count: {}", result);
+                return result;
+        }
+
+        @Override
+        public long countThisWeekActivities() {
+                log.info("[UserActivityRepositoryPortJpaImpl] countThisWeekActivities START");
+
+                long result = userActivityRepositoryJpa.countThisWeekActivities();
+
+                log.info("[UserActivityRepositoryPortJpaImpl] countThisWeekActivities END - count: {}", result);
+                return result;
+        }
+
+        @Override
+        public long countFailedLogs() {
+                log.info("[UserActivityRepositoryPortJpaImpl] countFailedLogs START");
+
+                long result = userActivityRepositoryJpa.countByStatus("FAILED");
+
+                log.info("[UserActivityRepositoryPortJpaImpl] countFailedLogs END - count: {}", result);
+                return result;
+        }
+
+        @Override
+        public long countActiveUsers() {
+                log.info("[UserActivityRepositoryPortJpaImpl] countActiveUsers START");
+
+                long result = userActivityRepositoryJpa.countActiveUsers();
+
+                log.info("[UserActivityRepositoryPortJpaImpl] countActiveUsers END - count: {}", result);
+                return result;
+        }
+
+        @Override
+        public void deleteById(Long id) {
+                log.info("[UserActivityRepositoryPortJpaImpl] deleteById START - id: {}", id);
+
+                userActivityRepositoryJpa.deleteById(id);
+
+                log.info("[UserActivityRepositoryPortJpaImpl] deleteById END - id: {}", id);
+        }
+
+        @Override
+        public void deleteOldActivities() {
+                log.info("[UserActivityRepositoryPortJpaImpl] deleteOldActivities START");
+
+                LocalDateTime cutoffDate = LocalDateTime.now().minusDays(30);
+                userActivityRepositoryJpa.deleteOldActivities(cutoffDate);
+
+                log.info("[UserActivityRepositoryPortJpaImpl] deleteOldActivities END");
+        }
+
+        @Override
+        public List<UserActivity> findByAdvancedSearch(String userId, String activityType, String status,
+                        String ipAddress, LocalDateTime startDate, LocalDateTime endDate) {
+                log.info("[UserActivityRepositoryPortJpaImpl] findByAdvancedSearch START - userId: {}, activityType: {}, status: {}",
+                                userId, activityType, status);
+
+                List<UserActivity> result = userActivityRepositoryJpa
+                                .findByAdvancedSearch(userId, activityType, status, ipAddress, startDate, endDate)
+                                .stream()
+                                .map(UserActivityEntity::toDomain)
+                                .collect(Collectors.toList());
+
+                log.info("[UserActivityRepositoryPortJpaImpl] findByAdvancedSearch END - count: {}", result.size());
+                return result;
+        }
+
+        @Override
+        public long countByAdvancedSearch(String userId, String activityType, String status,
+                        String ipAddress, LocalDateTime startDate, LocalDateTime endDate) {
+                log.info("[UserActivityRepositoryPortJpaImpl] countByAdvancedSearch START");
+
+                long result = userActivityRepositoryJpa.countByAdvancedSearch(userId, activityType, status, ipAddress,
+                                startDate, endDate);
+
+                log.info("[UserActivityRepositoryPortJpaImpl] countByAdvancedSearch END - count: {}", result);
+                return result;
+        }
+
+        @Override
+        public List<Map<String, Object>> getActivityTypeStatistics() {
+                log.info("[UserActivityRepositoryPortJpaImpl] getActivityTypeStatistics START");
+
+                LocalDateTime startDate = LocalDateTime.now().minusDays(30);
+                List<Object[]> results = userActivityRepositoryJpa.getActivityTypeStatistics(startDate);
+
+                List<Map<String, Object>> result = results.stream()
+                                .map(row -> Map.of(
+                                                "activityType", row[0],
+                                                "count", row[1],
+                                                "successCount", row[2],
+                                                "failedCount", row[3]))
+                                .collect(Collectors.toList());
+
+                log.info("[UserActivityRepositoryPortJpaImpl] getActivityTypeStatistics END - count: {}",
+                                result.size());
+                return result;
+        }
+
+        @Override
+        public List<Map<String, Object>> getHourlyStatistics() {
+                log.info("[UserActivityRepositoryPortJpaImpl] getHourlyStatistics START");
+
+                LocalDateTime startDate = LocalDateTime.now().minusDays(7);
+                List<Object[]> results = userActivityRepositoryJpa.getHourlyStatistics(startDate);
+
+                List<Map<String, Object>> result = results.stream()
+                                .map(row -> Map.of(
+                                                "hour", row[0],
+                                                "count", row[1]))
+                                .collect(Collectors.toList());
+
+                log.info("[UserActivityRepositoryPortJpaImpl] getHourlyStatistics END - count: {}", result.size());
+                return result;
+        }
 }

@@ -213,23 +213,23 @@
                     <h5 class="mb-3"><i class="fas fa-chart-bar"></i> 서비스 상태</h5>
                     <div class="status-item">
                         <span class="status-label">서비스 상태</span>
-                        <span class="status-value">정상</span>
+                        <span class="status-value" th:text="${serviceStatus}">정상</span>
                     </div>
                     <div class="status-item">
                         <span class="status-label">전체 사용자</span>
-                        <span class="status-value">1,234</span>
+                        <span class="status-value" th:text="${#numbers.formatInteger(totalUsers, 1, 'COMMA')}">0</span>
                     </div>
                     <div class="status-item">
                         <span class="status-label">활성 사용자</span>
-                        <span class="status-value">1,156</span>
+                        <span class="status-value" th:text="${#numbers.formatInteger(activeUsers, 1, 'COMMA')}">0</span>
                     </div>
                     <div class="status-item">
                         <span class="status-label">관리자</span>
-                        <span class="status-value">15</span>
+                        <span class="status-value" th:text="${#numbers.formatInteger(adminUsers, 1, 'COMMA')}">0</span>
                     </div>
                     <div class="status-item">
                         <span class="status-label">오늘 로그인</span>
-                        <span class="status-value">89</span>
+                        <span class="status-value" th:text="${#numbers.formatInteger(todayLoginUsers, 1, 'COMMA')}">0</span>
                     </div>
                 </div>
                 

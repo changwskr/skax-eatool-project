@@ -307,7 +307,7 @@ public class UserManagementWebController {
 
         List<UserActivity> activities;
         if (userId != null) {
-            activities = userActivityService.getUserActivities(userId);
+            activities = userActivityService.getActivitiesByUserId(userId.toString());
         } else if (activityType != null) {
             activities = userActivityService.getActivitiesByType(activityType);
         } else if (status != null) {
@@ -336,7 +336,7 @@ public class UserManagementWebController {
             Model model) {
         log.info("[UserManagementWebController.userActivityLogsPage START]");
 
-        Page<UserActivity> activities = userActivityService.getUserActivities(userId, pageable);
+        Page<UserActivity> activities = userActivityService.getActivitiesByUserId(userId.toString(), pageable);
 
         model.addAttribute("title", "사용자 동적 로그");
         model.addAttribute("activities", activities);

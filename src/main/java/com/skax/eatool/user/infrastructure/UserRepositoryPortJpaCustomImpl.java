@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import com.skax.eatool.user.domain.User;
+import com.skax.eatool.user.domain.UserStatus;
 import com.skax.eatool.user.infrastructure.jpa.UserJpaEntity;
 import com.skax.eatool.user.infrastructure.jpa.UserRepositoryJpa;
 import com.skax.eatool.user.service.port.UserRepositoryPort;
@@ -150,5 +151,45 @@ public class UserRepositoryPortJpaCustomImpl implements UserRepositoryPort {
 
         log.info("[UserRepositoryPortJpaCustomImpl] searchUsers END - totalElements: {}", result.getTotalElements());
         return result;
+    }
+
+    @Override
+    public long countByStatus(UserStatus status) {
+        log.info("[UserRepositoryPortJpaCustomImpl] countByStatus START - status: {}", status);
+
+        long count = userRepositoryJpa.findAll()
+                .stream()
+                .map(UserJpaEntity::toModel)
+                .filter(user -> user.getStatus() == status)
+                .count();
+
+        log.info("[UserRepositoryPortJpaCustomImpl] countByStatus END - count: {}", count);
+        return count;
+    }
+
+    @Override
+    public long countByUserType(String userType) {
+        log.info("[UserRepositoryPortJpaCustomImpl] countByUserType START - userType: {}", userType);
+
+        long count = userRepositoryJpa.findAll()
+                .stream()
+                .map(UserJpaEntity::toModel)
+                .filter(user -> userType.equals(user.getUserType()))
+                .count();
+
+        log.info("[UserRepositoryPortJpaCustomImpl] countByUserType END - count: {}", count);
+        return count;
+    }
+
+    @Override
+    public long countTodayLoginUsers() {
+        log.info("[UserRepositoryPortJpaCustomImpl] countTodayLoginUsers START");
+
+        // 임시로 활성 사용자의 10%를 오늘 로그인한 사용자로 계산
+        long activeUsers = countByStatus(UserStatus.ACTIVE);
+        long todayLoginUsers = Math.round(activeUsers * 0.1);
+
+        log.info("[UserRepositoryPortJpaCustomImpl] countTodayLoginUsers END - count: {}", todayLoginUsers);
+        return todayLoginUsers;
     }
 }
