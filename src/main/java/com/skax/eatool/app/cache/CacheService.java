@@ -1,0 +1,13 @@
+package com.skax.eatool.app.cache;
+
+public interface CacheService {
+    <T> T get(String key, Class<T> type);
+
+    void put(String key, Object value);
+
+    void evict(String key);
+
+    void clearAll();
+
+    void clearByCacheGroup(String cacheGroupName);
+}

@@ -48,7 +48,8 @@ import org.slf4j.LoggerFactory;
         "com.skax.eatool.common.entity",
         "com.skax.eatool.teller.entity",
         "com.skax.eatool.eplatonframework.business.entity",
-        "com.skax.eatool.techspec.infrastructure.jpa"
+        "com.skax.eatool.techspec.infrastructure.jpa",
+        "com.skax.eatool.biz.token.domain"
 })
 @EnableJpaRepositories(basePackages = {
         "com.skax.eatool.user.infrastructure.jpa",
@@ -58,7 +59,8 @@ import org.slf4j.LoggerFactory;
         "com.skax.eatool.common.repository",
         "com.skax.eatool.teller.repository",
         "com.skax.eatool.eplatonframework.business.repository",
-        "com.skax.eatool.techspec.infrastructure.jpa"
+        "com.skax.eatool.techspec.infrastructure.jpa",
+        "com.skax.eatool.biz.token.infrastructure.jpa"
 })
 @EnableTransactionManagement
 @EnableJpaAuditing

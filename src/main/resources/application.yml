@@ -1,6 +1,11 @@
 spring:
   main:
     allow-bean-definition-overriding: true
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
   datasource:
     url: jdbc:h2:mem:testdb;DB_CLOSE_ON_EXIT=FALSE
     driver-class-name: org.h2.Driver
@@ -35,6 +40,36 @@ spring:
   session:
     timeout: 240m
     store-type: none
+  # Redis Configuration
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+      database: 0
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+  # RabbitMQ Configuration
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+    connection-timeout: 5000ms
+    listener:
+      simple:
+        retry:
+          enabled: true
+          initial-interval: 1000ms
+          max-attempts: 3
+          multiplier: 1.0
+          max-interval: 10000ms
 
 # MyBatis Configuration (임시 비활성화)
 # mybatis:
@@ -88,3 +123,14 @@ tpmservice:
   url: http://localhost:8080
   timeout: 30
 bizaction-map-filename: classpath:config/eatool-config.xml
+
+# Cache Configuration
+my:
+  cache:
+    type: redis # redis 또는 caffeine 선택
+
+# JWT Configuration
+jwt:
+  secret: your-secret-key-here-make-it-long-and-secure-at-least-256-bits
+  expiration: 3600000 # 1시간 (밀리초)
+

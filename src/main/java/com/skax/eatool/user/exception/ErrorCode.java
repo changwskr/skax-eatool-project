@@ -7,7 +7,11 @@ public enum ErrorCode {
     INVALID_INPUT("잘못된 입력입니다."),
     UNAUTHORIZED("인증이 필요합니다."),
     FORBIDDEN("접근 권한이 없습니다."),
-    NOT_FOUND_FILE("파일을 찾을 수 없습니다.");
+    NOT_FOUND_FILE("파일을 찾을 수 없습니다."),
+    JWT_EXPIRED_TOKEN("JWT 토큰이 만료되었습니다."),
+    JWT_INVALID_SIGNATURE("JWT 토큰의 서명이 유효하지 않습니다."),
+    JWT_INVALID("JWT 토큰이 유효하지 않습니다."),
+    JWT_NOT_FOUND("JWT 토큰을 찾을 수 없습니다.");
 
     private final String message;
 
