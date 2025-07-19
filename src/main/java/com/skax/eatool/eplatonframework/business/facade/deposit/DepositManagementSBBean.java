@@ -16,23 +16,24 @@ import com.skax.eatool.foundation.logej.*;
 
 /**
  * =============================================================================
- * ?�로그램 ?�명: Spring Boot 기반 Deposit Management Service
+ * 프로그램 명: Spring Boot 기반 Deposit Management Service
  * =============================================================================
- * Spring Boot ?�경?�서 Deposit 관�??�비?��? ?�공?�는 ?�래?�입?�다.
- * EJB?�서 Spring Boot�?마이그레?�션???�비?�입?�다.
+ * Spring Boot 환경에서 Deposit 관리 서비스를 제공하는 클래스입니다.
+ * EJB에서 Spring Boot로 마이그레이션된 서비스입니다.
  * 
  * =============================================================================
- * 변경내???�보:
+ * 변경내역보:
  * =============================================================================
- *  2004??03??16??1차버??release (EJB)
- *  2024??Spring Boot 변???�료
+ * 2004년 03월 16일 1차버전 release (EJB)
+ * 2024년 Spring Boot 변환 완료
  *
  * =============================================================================
- *                                                        @author : ?�우??WooSungJang)
- *                                                        @company: IMS SYSTEM
- *                                                        @email  : changwskr@yahoo.co.kr
- *                                                        @version 2.0 (Spring Boot)
- *  =============================================================================
+ * 
+ * @author : 우성장(WooSungJang)
+ * @company: IMS SYSTEM
+ * @email : changwskr@yahoo.co.kr
+ * @version 2.0 (Spring Boot)
+ *          =============================================================================
  */
 
 @Service
@@ -42,26 +43,27 @@ public class DepositManagementSBBean {
     private static final Logger logger = LoggerFactory.getLogger(DepositManagementSBBean.class);
 
     /**
-     * Deposit 관�??�벤?��? 처리?�는 메서??     * Spring Boot ?�경?�서 ?�랜??��??관리합?�다.
+     * Deposit 관리 서비스를 처리하는 메서드입니다.
+     * Spring Boot 환경에서 트랜잭션을 관리합니다.
      */
     @Transactional
     public EPlatonEvent execute(EPlatonEvent event) throws CosesAppException {
         EPlatonEvent resp_event = null;
-        
+
         try {
             resp_event = event;
-            
+
             logger.info("Deposit Management Service execute started for event: {}", event);
-            
+
             EPlatonCommonDTO commonDTO = (EPlatonCommonDTO) event.getCommon();
             TPSVCINFODTO tpsvcinfo = event.getTPSVCINFODTO();
-            
-            logger.debug("Processing deposit management request for transaction: {}", 
-                        tpsvcinfo != null ? tpsvcinfo.getTransaction_id() : "unknown");
-            
-            // ?�청 ?�?�에 ?�른 처리
+
+            logger.debug("Processing deposit management request for transaction: {}",
+                    tpsvcinfo != null ? tpsvcinfo.getTransaction_id() : "unknown");
+
+            // 요청 타입에 따른 처리
             String requestType = tpsvcinfo != null ? tpsvcinfo.getReqName() : "";
-            
+
             switch (requestType) {
                 case "QUERY_DEPOSIT":
                     return processQueryDeposit(event);
@@ -75,11 +77,11 @@ public class DepositManagementSBBean {
                     logger.warn("Unknown request type: {}", requestType);
                     return event;
             }
-            
+
         } catch (Exception re) {
             logger.error("Error in Deposit Management Service execute", re);
-            
-            // ?�러 처리
+
+            // 에러 처리
             if (resp_event != null) {
                 TPSVCINFODTO tpsvcinfo = resp_event.getTPSVCINFODTO();
                 if (tpsvcinfo != null) {
@@ -106,13 +108,13 @@ public class DepositManagementSBBean {
                     }
                 }
             }
-            
+
             // 로깅
             LOGEJ.getInstance().eprintf(5, event, re);
             if (resp_event != null) {
                 LOGEJ.getInstance().printf(1, resp_event, this.getClass().getName() + ".execute():" + re.toString());
             }
-            
+
             throw new CosesAppException("Deposit Management Service execution failed", re);
         }
     }
@@ -123,14 +125,14 @@ public class DepositManagementSBBean {
     @Transactional(readOnly = true)
     private EPlatonEvent processQueryDeposit(EPlatonEvent event) throws CosesAppException {
         logger.debug("Processing query deposit request");
-        
+
         try {
             // Deposit 조회 로직 구현
-            // TODO: ?�제 비즈?�스 로직 구현
-            
+            // TODO: 실제 비즈니스 로직 구현
+
             logger.info("Query deposit completed successfully");
             return event;
-            
+
         } catch (Exception e) {
             logger.error("Error processing query deposit", e);
             throw new CosesAppException("Failed to query deposit", e);
@@ -138,19 +140,19 @@ public class DepositManagementSBBean {
     }
 
     /**
-     * Deposit ?�성 처리
+     * Deposit 생성 처리
      */
     @Transactional
     private EPlatonEvent processCreateDeposit(EPlatonEvent event) throws CosesAppException {
         logger.debug("Processing create deposit request");
-        
+
         try {
-            // Deposit ?�성 로직 구현
-            // TODO: ?�제 비즈?�스 로직 구현
-            
+            // Deposit 생성 로직 구현
+            // TODO: 실제 비즈니스 로직 구현
+
             logger.info("Create deposit completed successfully");
             return event;
-            
+
         } catch (Exception e) {
             logger.error("Error processing create deposit", e);
             throw new CosesAppException("Failed to create deposit", e);
@@ -158,19 +160,19 @@ public class DepositManagementSBBean {
     }
 
     /**
-     * Deposit ?�정 처리
+     * Deposit 수정 처리
      */
     @Transactional
     private EPlatonEvent processUpdateDeposit(EPlatonEvent event) throws CosesAppException {
         logger.debug("Processing update deposit request");
-        
+
         try {
-            // Deposit ?�정 로직 구현
-            // TODO: ?�제 비즈?�스 로직 구현
-            
+            // Deposit 수정 로직 구현
+            // TODO: 실제 비즈니스 로직 구현
+
             logger.info("Update deposit completed successfully");
             return event;
-            
+
         } catch (Exception e) {
             logger.error("Error processing update deposit", e);
             throw new CosesAppException("Failed to update deposit", e);
@@ -178,24 +180,22 @@ public class DepositManagementSBBean {
     }
 
     /**
-     * Deposit ??�� 처리
+     * Deposit 삭제 처리
      */
     @Transactional
     private EPlatonEvent processDeleteDeposit(EPlatonEvent event) throws CosesAppException {
         logger.debug("Processing delete deposit request");
-        
+
         try {
-            // Deposit ??�� 로직 구현
-            // TODO: ?�제 비즈?�스 로직 구현
-            
+            // Deposit 삭제 로직 구현
+            // TODO: 실제 비즈니스 로직 구현
+
             logger.info("Delete deposit completed successfully");
             return event;
-            
+
         } catch (Exception e) {
             logger.error("Error processing delete deposit", e);
             throw new CosesAppException("Failed to delete deposit", e);
         }
     }
 }
-
-

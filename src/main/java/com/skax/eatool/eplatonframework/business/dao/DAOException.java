@@ -1,50 +1,52 @@
 package com.skax.eatool.eplatonframework.business.dao;
 
 /**
- * <p>Title: </p>
- * <p>Description: </p>
- * <p>Copyright: Copyright (c) 2002</p>
- * <p>Company: </p>
+ * <p>
+ * Title:
+ * </p>
+ * <p>
+ * Description:
+ * </p>
+ * <p>
+ * Copyright: Copyright (c) 2002
+ * </p>
+ * <p>
+ * Company:
+ * </p>
+ * 
  * @author unascribed
  * @version 1.0
  */
 
-public class DAOException extends Exception
-{
+public class DAOException extends Exception {
     private Exception cause;
 
-    public DAOException()
-    {
+    public DAOException() {
         super();
     }
 
-    public DAOException(String message)
-    {
+    public DAOException(String message) {
         super(message);
     }
 
-    public DAOException(Exception cause)
-    {
+    public DAOException(Exception cause) {
         super();
         this.cause = cause;
     }
 
-    public DAOException(String message, Exception cause)
-    {
+    public DAOException(String message, Exception cause) {
         super(message);
         this.cause = cause;
     }
 
-    public Exception getCausedException()
-    {
+    public Exception getCausedException() {
         return cause;
     }
 
     /**
-      * 泥댁?????�쇅媛 ??�떎�??�몄???�뿉 ?�붽???�뿬 ???��以??
+     * 원인 예외가 있다면 추가하여 반환합니다.
      */
-    public String toString()
-    {
+    public String toString() {
         StringBuffer sb = new StringBuffer(super.toString());
         if (cause != null) {
             sb.append(System.getProperty("line.separator"));

@@ -16,11 +16,11 @@ import com.skax.eatool.foundation.utility.StringUtils;
  * @version 1.0, 2002/11/01
  */
 public abstract class AbstractEntity {
-    
+
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-    
+
     /**
-     * DB 변??문자?�을 escape처리?�다.
+     * DB 변수문자열을 escape처리합니다.
      */
     public static String escape(String value) {
         if (null == value)

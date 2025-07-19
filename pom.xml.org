@@ -102,6 +102,45 @@
           <source>18</source>
           <target>18</target>
           <encoding>UTF-8</encoding>
+          <excludes>
+            <!-- 레거시 EJB 코드 제외 (변환되지 않은 파일들만) -->
+            <!-- CashCardManagementSBBean.java는 CashCardManagementService.java로 변환되어 제외에서 제거 -->
+            <exclude>**/eplatonframework/business/facade/**/*SB.java</exclude>
+            <exclude>**/eplatonframework/business/facade/**/*Home.java</exclude>
+            <exclude>**/eplatonframework/business/facade/**/*Local*.java</exclude>
+            <exclude>**/eplatonframework/business/client/**</exclude>
+            <!-- TPM service는 변환되어 제외에서 제거됨 -->
+            <!-- AbstractTCF는 변환되어 제외에서 제거됨 -->
+            <exclude>**/cashCard/business/facade/**/*Bean.java</exclude>
+            <exclude>**/cashCard/business/facade/**/*Home.java</exclude>
+            <exclude>**/cashCard/business/cashCardRule/helper/JNDINamesRule.java</exclude>
+            <exclude>**/cashCard/business/cashCard/helper/JNDINamesThing.java</exclude>
+            <!-- EJBUtil 클래스들은 Spring 클래스로 변환되어 제외에서 제거됨 -->
+            
+            <!-- 아직 변환되지 않은 EJB Bean 파일들 -->
+            <exclude>**/eplatonframework/business/facade/**/DepositManagementSBBean.java</exclude>
+            <exclude>**/eplatonframework/business/facade/**/TellerManagementSBBean.java</exclude>
+            <exclude>**/eplatonframework/business/facade/**/SPdepositManagementSBBean.java</exclude>
+            <exclude>**/eplatonframework/business/facade/**/SPcashcardManagementSBBean.java</exclude>
+            <exclude>**/eplatonframework/business/facade/**/SPcommoManagementSBBean.java</exclude>
+            <exclude>**/eplatonframework/business/facade/**/ECommonManagementSBBean.java</exclude>
+            
+            <!-- 의존성 문제가 있는 파일들 제외 -->
+            <exclude>**/eplatonframework/business/entity/CashCard.java</exclude>
+            <exclude>**/eplatonframework/transfer/EPLcommonCDTO.java</exclude>
+            <exclude>**/eplatonframework/business/controller/TransactionLogController.java</exclude>
+            <exclude>**/eplatonframework/business/controller/CashCardController.java</exclude>
+            <exclude>**/eplatonframework/business/dao/**</exclude>
+            <!-- framework/transaction/dao는 변환되어 제외에서 제거됨 -->
+            <!-- framework/transaction/model은 변환되어 제외에서 제거됨 -->
+            <!-- DTOConverter는 변환되어 제외에서 제거됨 -->
+            <exclude>**/eplatonframework/transfer/TPMSVCINFO.java</exclude>
+            <exclude>**/eplatonframework/transfer/TPSVCINFODTO.java</exclude>
+            <exclude>**/eplatonframework/transfer/EPlatonCommonDTO.java</exclude>
+            <exclude>**/eplatonframework/business/model/**</exclude>
+            <exclude>**/deposit/business/facade/DepositManagementSBean.java</exclude>
+            <exclude>**/cashCard/transfer/CardParentQueryConditionCDTO.java</exclude>
+          </excludes>
         </configuration>
       </plugin>
     </plugins>

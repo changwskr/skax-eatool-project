@@ -14,28 +14,22 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
- * EPlaton Transaction Time Processing DAO Factory???˜í??¸ë‹¤.
+ * EPlaton Transaction Time Processing DAO Factoryìž…ë‹ˆë‹¤.
  *
- * @author  <a href="mailto:ghyu@imssystem.com">Gwanghyeok Yu</a>
+ * @author <a href="mailto:ghyu@imssystem.com">Gwanghyeok Yu</a>
  * @version 1.0, 2002/10/08
  */
 @Component
-public class TxTimeProcDAOFactory
-{
+public class TxTimeProcDAOFactory {
     @Autowired
     @Qualifier("eplatonTxTimeProcDAO")
     private TxTimeProcDAO txTimeProcDAO;
 
-    public ITxTimeProcDAO getTxTimeProcDAO()
-    {
+    public ITxTimeProcDAO getTxTimeProcDAO() {
         return txTimeProcDAO;
     }
 
-    public void setTxTimeProcDAO(TxTimeProcDAO txTimeProcDAO)
-    {
+    public void setTxTimeProcDAO(TxTimeProcDAO txTimeProcDAO) {
         this.txTimeProcDAO = txTimeProcDAO;
     }
 }
-
-
-

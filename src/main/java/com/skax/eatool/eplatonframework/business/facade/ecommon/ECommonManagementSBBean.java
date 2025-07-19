@@ -17,23 +17,24 @@ import com.skax.eatool.foundation.logej.*;
 
 /**
  * =============================================================================
- * ?�로그램 ?�명: Spring Boot 기반 ECommon Management Service
+ * 프로그램 명: Spring Boot 기반 ECommon Management Service
  * =============================================================================
- * Spring Boot ?�경?�서 ECommon 관�??�비?��? ?�공?�는 ?�래?�입?�다.
- * EJB?�서 Spring Boot�?마이그레?�션???�비?�입?�다.
+ * Spring Boot 환경에서 ECommon 관리 서비스를 제공하는 클래스입니다.
+ * EJB에서 Spring Boot로 마이그레이션된 서비스입니다.
  * 
  * =============================================================================
- * 변경내???�보:
+ * 변경내역보:
  * =============================================================================
- *  2004??03??16??1차버??release (EJB)
- *  2024??Spring Boot 변???�료
+ * 2004년 03월 16일 1차버전 release (EJB)
+ * 2024년 Spring Boot 변환 완료
  *
  * =============================================================================
- *                                                        @author : ?�우??WooSungJang)
- *                                                        @company: IMS SYSTEM
- *                                                        @email  : changwskr@yahoo.co.kr
- *                                                        @version 2.0 (Spring Boot)
- *  =============================================================================
+ * 
+ * @author : 우성장(WooSungJang)
+ * @company: IMS SYSTEM
+ * @email : changwskr@yahoo.co.kr
+ * @version 2.0 (Spring Boot)
+ *          =============================================================================
  */
 
 @Service
@@ -43,26 +44,27 @@ public class ECommonManagementSBBean {
     private static final Logger logger = LoggerFactory.getLogger(ECommonManagementSBBean.class);
 
     /**
-     * ECommon 관�??�벤?��? 처리?�는 메서??     * Spring Boot ?�경?�서 ?�랜??��??관리합?�다.
+     * ECommon 관리 서비스를 처리하는 메서드입니다.
+     * Spring Boot 환경에서 트랜잭션을 관리합니다.
      */
     @Transactional
     public EPlatonEvent execute(EPlatonEvent event) throws CosesAppException {
         EPlatonEvent resp_event = null;
-        
+
         try {
             resp_event = event;
-            
+
             logger.info("ECommon Management Service execute started for event: {}", event);
-            
+
             EPlatonCommonDTO commonDTO = (EPlatonCommonDTO) event.getCommon();
             TPSVCINFODTO tpsvcinfo = event.getTPSVCINFODTO();
-            
-            logger.debug("Processing ecommon management request for transaction: {}", 
-                        tpsvcinfo != null ? tpsvcinfo.getTransaction_id() : "unknown");
-            
-            // ?�청 ?�?�에 ?�른 처리
+
+            logger.debug("Processing ecommon management request for transaction: {}",
+                    tpsvcinfo != null ? tpsvcinfo.getTransaction_id() : "unknown");
+
+            // 요청 타입에 따른 처리
             String requestType = tpsvcinfo != null ? tpsvcinfo.getReqName() : "";
-            
+
             switch (requestType) {
                 case "QUERY_ECOMMON":
                     return processQueryECommon(event);
@@ -76,11 +78,11 @@ public class ECommonManagementSBBean {
                     logger.warn("Unknown request type: {}", requestType);
                     return event;
             }
-            
+
         } catch (Exception re) {
             logger.error("Error in ECommon Management Service execute", re);
-            
-            // ?�러 처리
+
+            // 에러 처리
             if (resp_event != null) {
                 TPSVCINFODTO tpsvcinfo = resp_event.getTPSVCINFODTO();
                 if (tpsvcinfo != null) {
@@ -107,13 +109,13 @@ public class ECommonManagementSBBean {
                     }
                 }
             }
-            
+
             // 로깅
             LOGEJ.getInstance().eprintf(5, event, re);
             if (resp_event != null) {
                 LOGEJ.getInstance().printf(1, resp_event, this.getClass().getName() + ".execute():" + re.toString());
             }
-            
+
             throw new CosesAppException("ECommon Management Service execution failed", re);
         }
     }
@@ -124,14 +126,14 @@ public class ECommonManagementSBBean {
     @Transactional(readOnly = true)
     private EPlatonEvent processQueryECommon(EPlatonEvent event) throws CosesAppException {
         logger.debug("Processing query ecommon request");
-        
+
         try {
             // ECommon 조회 로직 구현
-            // TODO: ?�제 비즈?�스 로직 구현
-            
+            // TODO: 실제 비즈니스 로직 구현
+
             logger.info("Query ecommon completed successfully");
             return event;
-            
+
         } catch (Exception e) {
             logger.error("Error processing query ecommon", e);
             throw new CosesAppException("Failed to query ecommon", e);
@@ -139,19 +141,19 @@ public class ECommonManagementSBBean {
     }
 
     /**
-     * ECommon ?�성 처리
+     * ECommon 생성 처리
      */
     @Transactional
     private EPlatonEvent processCreateECommon(EPlatonEvent event) throws CosesAppException {
         logger.debug("Processing create ecommon request");
-        
+
         try {
-            // ECommon ?�성 로직 구현
-            // TODO: ?�제 비즈?�스 로직 구현
-            
+            // ECommon 생성 로직 구현
+            // TODO: 실제 비즈니스 로직 구현
+
             logger.info("Create ecommon completed successfully");
             return event;
-            
+
         } catch (Exception e) {
             logger.error("Error processing create ecommon", e);
             throw new CosesAppException("Failed to create ecommon", e);
@@ -159,19 +161,19 @@ public class ECommonManagementSBBean {
     }
 
     /**
-     * ECommon ?�정 처리
+     * ECommon 수정 처리
      */
     @Transactional
     private EPlatonEvent processUpdateECommon(EPlatonEvent event) throws CosesAppException {
         logger.debug("Processing update ecommon request");
-        
+
         try {
-            // ECommon ?�정 로직 구현
-            // TODO: ?�제 비즈?�스 로직 구현
-            
+            // ECommon 수정 로직 구현
+            // TODO: 실제 비즈니스 로직 구현
+
             logger.info("Update ecommon completed successfully");
             return event;
-            
+
         } catch (Exception e) {
             logger.error("Error processing update ecommon", e);
             throw new CosesAppException("Failed to update ecommon", e);
@@ -179,19 +181,19 @@ public class ECommonManagementSBBean {
     }
 
     /**
-     * ECommon ??�� 처리
+     * ECommon 삭제 처리
      */
     @Transactional
     private EPlatonEvent processDeleteECommon(EPlatonEvent event) throws CosesAppException {
         logger.debug("Processing delete ecommon request");
-        
+
         try {
-            // ECommon ??�� 로직 구현
-            // TODO: ?�제 비즈?�스 로직 구현
-            
+            // ECommon 삭제 로직 구현
+            // TODO: 실제 비즈니스 로직 구현
+
             logger.info("Delete ecommon completed successfully");
             return event;
-            
+
         } catch (Exception e) {
             logger.error("Error processing delete ecommon", e);
             throw new CosesAppException("Failed to delete ecommon", e);
