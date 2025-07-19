@@ -110,7 +110,9 @@ public class UserActivityResponse {
                 .status(userActivity.getStatus())
                 .processingTime(userActivity.getProcessingTime())
                 .additionalInfo(userActivity.getAdditionalInfo())
-                .timestamp(userActivity.getTimestamp() != null ? userActivity.getTimestamp().format(formatter) : null)
+                .timestamp(userActivity.getActivityTimestamp() != null
+                        ? userActivity.getActivityTimestamp().format(formatter)
+                        : null)
                 .createdDate(
                         userActivity.getCreatedDate() != null ? userActivity.getCreatedDate().format(formatter) : null)
                 .lastModifiedDate(userActivity.getLastModifiedDate() != null

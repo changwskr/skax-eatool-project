@@ -63,8 +63,8 @@ public class UserActivityRestController {
             LocalDateTime endDateTime = LocalDateTime.parse(endDate + "T23:59:59");
 
             filteredActivities = filteredActivities.stream()
-                    .filter(activity -> activity.getTimestamp().isAfter(startDateTime) &&
-                            activity.getTimestamp().isBefore(endDateTime))
+                    .filter(activity -> activity.getActivityTimestamp().isAfter(startDateTime) &&
+                            activity.getActivityTimestamp().isBefore(endDateTime))
                     .toList();
         }
 

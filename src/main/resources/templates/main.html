@@ -115,6 +115,14 @@
             color: #17a2b8;
         }
         
+        .service-card.transaction-log .service-icon {
+            color: #fd7e14;
+        }
+        
+        .service-card.activity-log .service-icon {
+            color: #20c997;
+        }
+        
         .service-title {
             font-size: 1.5rem;
             font-weight: 600;
@@ -191,6 +199,16 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/techspec">
                             <i class="fas fa-microchip"></i> Tech Spec
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/transaction-logs">
+                            <i class="fas fa-chart-line"></i> Transaction Log
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user-management-web/activity-logs">
+                            <i class="fas fa-history"></i> Activity Log
                         </a>
                     </li>
                     <li class="nav-item" th:if="${!isAuthenticated}">
@@ -273,6 +291,26 @@
                     <div class="service-title">Tech Spec</div>
                     <div class="service-description">
                         프로젝트 기술 스택 관리 및 스펙 문서 관리 시스템
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-md-6 col-lg-2">
+                <a href="/transaction-logs" class="service-card transaction-log">
+                    <i class="fas fa-chart-line service-icon"></i>
+                    <div class="service-title">Transaction Log</div>
+                    <div class="service-description">
+                        시스템 트랜잭션 로그 조회, 통계 및 모니터링
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-md-6 col-lg-2">
+                <a href="/user-management-web/activity-logs" class="service-card activity-log">
+                    <i class="fas fa-history service-icon"></i>
+                    <div class="service-title">Activity Log</div>
+                    <div class="service-description">
+                        사용자 활동 로그 조회, 분석 및 관리
                     </div>
                 </a>
             </div>

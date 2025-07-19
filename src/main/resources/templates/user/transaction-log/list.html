@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">트랜잭션 로그 목록</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .search-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .log-table {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .table th {
+            background: #f8f9fa;
+            border: none;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .table td {
+            border: none;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
+        
+        .success-badge {
+            background: #d1e7dd;
+            color: #0f5132;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+        
+        .failure-badge {
+            background: #f8d7da;
+            color: #842029;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+        
+        .system-badge {
+            background: #e2e3e5;
+            color: #495057;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+        
+        .pagination-info {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col">
+                <h1 class="mb-3">
+                    <i class="fas fa-list text-primary"></i>
+                    트랜잭션 로그 목록
+                </h1>
+                <p class="text-muted">시스템 트랜잭션 로그를 조회하고 검색할 수 있습니다.</p>
+            </div>
+        </div>
+
+        <!-- 오류 메시지 표시 -->
+        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span th:text="${errorMessage}"></span>
+        </div>
+
+        <!-- 검색 폼 -->
+        <div class="search-card">
+            <h4 class="mb-3">
+                <i class="fas fa-search text-primary"></i>
+                검색 조건
+            </h4>
+            <form th:action="@{/transaction-log/list}" method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="userId" class="form-label">사용자 ID</label>
+                    <input type="text" class="form-control" id="userId" name="userId" 
+                           th:value="${searchUserId}" placeholder="사용자 ID를 입력하세요">
+                </div>
+                <div class="col-md-3">
+                    <label for="systemName" class="form-label">시스템명</label>
+                    <input type="text" class="form-control" id="systemName" name="systemName" 
+                           th:value="${searchSystemName}" placeholder="시스템명을 입력하세요">
+                </div>
+                <div class="col-md-3">
+                    <label for="methodName" class="form-label">메서드명</label>
+                    <input type="text" class="form-control" id="methodName" name="methodName" 
+                           th:value="${searchMethodName}" placeholder="메서드명을 입력하세요">
+                </div>
+                <div class="col-md-3">
+                    <label for="errorCode" class="form-label">에러 코드</label>
+                    <select class="form-select" id="errorCode" name="errorCode">
+                        <option value="">전체</option>
+                        <option value="I0000" th:selected="${searchErrorCode == 'I0000'}">성공 (I0000)</option>
+                        <option value="E" th:selected="${searchErrorCode == 'E'}">실패 (E로 시작)</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="startDate" class="form-label">시작일</label>
+                    <input type="date" class="form-control" id="startDate" name="startDate" 
+                           th:value="${searchStartDate}">
+                </div>
+                <div class="col-md-3">
+                    <label for="endDate" class="form-label">종료일</label>
+                    <input type="date" class="form-control" id="endDate" name="endDate" 
+                           th:value="${searchEndDate}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">&nbsp;</label>
+                    <div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i>
+                            검색
+                        </button>
+                        <a href="/transaction-log/list" class="btn btn-secondary">
+                            <i class="fas fa-undo"></i>
+                            초기화
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- 페이징 정보 -->
+        <div th:if="${totalCount > 0}" class="pagination-info">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <span class="text-muted">
+                        총 <strong th:text="${totalCount}">0</strong>개의 트랜잭션 로그
+                    </span>
+                </div>
+                <div class="col-md-6 text-end">
+                    <span class="text-muted">
+                        페이지 <strong th:text="${currentPage + 1}">1</strong> / <strong th:text="${totalPages}">1</strong>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 트랜잭션 로그 테이블 -->
+        <div class="log-table">
+            <div th:if="${transactionLogs != null and !transactionLogs.empty}">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>트랜잭션 ID</th>
+                                <th>사용자 ID</th>
+                                <th>시스템명</th>
+                                <th>메서드명</th>
+                                <th>응답시간</th>
+                                <th>상태</th>
+                                <th>IP 주소</th>
+                                <th>생성일시</th>
+                                <th>상세</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="log : ${transactionLogs}">
+                                <td>
+                                    <span class="badge bg-secondary" th:text="${log.transactionId}">TXN_ID</span>
+                                </td>
+                                <td>
+                                    <i class="fas fa-user text-primary"></i>
+                                    <span th:text="${log.userId}">USER_ID</span>
+                                </td>
+                                <td>
+                                    <span class="system-badge" th:text="${log.systemName}">SYSTEM</span>
+                                </td>
+                                <td>
+                                    <code th:text="${log.methodName}">METHOD</code>
+                                </td>
+                                <td>
+                                    <span th:text="${log.responseTime} + 'ms'" class="text-info">0ms</span>
+                                </td>
+                                <td>
+                                    <span th:if="${log.errorCode == 'I0000'}" class="success-badge">
+                                        <i class="fas fa-check"></i> 성공
+                                    </span>
+                                    <span th:unless="${log.errorCode == 'I0000'}" class="failure-badge">
+                                        <i class="fas fa-times"></i> 실패
+                                    </span>
+                                </td>
+                                <td>
+                                    <small th:text="${log.ipAddress}" class="text-muted">IP</small>
+                                </td>
+                                <td>
+                                    <small th:text="${#temporals.format(log.createdAt, 'yyyy-MM-dd HH:mm:ss')}" class="text-muted">
+                                        DATE
+                                    </small>
+                                </td>
+                                <td>
+                                    <a th:href="@{/transaction-log/detail/{id}(id=${log.id})}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                        상세
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 페이징 -->
+                <nav th:if="${totalPages > 1}" aria-label="트랜잭션 로그 페이지">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                            <a class="page-link" th:href="@{/transaction-log/list(page=${currentPage - 1}, userId=${searchUserId}, systemName=${searchSystemName}, methodName=${searchMethodName}, errorCode=${searchErrorCode}, startDate=${searchStartDate}, endDate=${searchEndDate})}">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        
+                        <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                            th:classappend="${pageNum == currentPage} ? 'active'">
+                            <a class="page-link" th:href="@{/transaction-log/list(page=${pageNum}, userId=${searchUserId}, systemName=${searchSystemName}, methodName=${searchMethodName}, errorCode=${searchErrorCode}, startDate=${searchStartDate}, endDate=${searchEndDate})}"
+                               th:text="${pageNum + 1}">1</a>
+                        </li>
+                        
+                        <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                            <a class="page-link" th:href="@{/transaction-log/list(page=${currentPage + 1}, userId=${searchUserId}, systemName=${searchSystemName}, methodName=${searchMethodName}, errorCode=${searchErrorCode}, startDate=${searchStartDate}, endDate=${searchEndDate})}">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            
+            <div th:if="${transactionLogs == null or transactionLogs.empty}" class="text-center py-5">
+                <i class="fas fa-info-circle text-muted" style="font-size: 4rem;"></i>
+                <h4 class="text-muted mt-3">트랜잭션 로그가 없습니다</h4>
+                <p class="text-muted">검색 조건을 변경하거나 트랜잭션을 실행해보세요.</p>
+                <a href="/test/transaction" class="btn btn-primary">
+                    <i class="fas fa-play"></i>
+                    트랜잭션 로그 테스트
+                </a>
+            </div>
+        </div>
+
+        <!-- 빠른 액션 -->
+        <div class="row mt-4">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-tools text-warning"></i>
+                            빠른 액션
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="/transaction-log" class="btn btn-outline-primary">
+                            <i class="fas fa-chart-line"></i>
+                            트랜잭션 로그 메인
+                        </a>
+                        <a href="/transaction-log/statistics" class="btn btn-outline-info">
+                            <i class="fas fa-chart-bar"></i>
+                            트랜잭션 통계
+                        </a>
+                        <a href="/test/transaction" class="btn btn-outline-success">
+                            <i class="fas fa-play"></i>
+                            트랜잭션 로그 테스트
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

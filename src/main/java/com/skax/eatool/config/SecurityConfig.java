@@ -1,5 +1,8 @@
 package com.skax.eatool.config;
 
+import com.skax.eatool.user.handler.CustomAuthenticationFailureHandler;
+import com.skax.eatool.user.handler.CustomAuthenticationSuccessHandler;
+import com.skax.eatool.user.handler.CustomLogoutSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 /**
  * Security Configuration for SKCC Oversea Application
@@ -20,11 +24,21 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
  */
 @Configuration
 @EnableWebSecurity
+@EnableJpaAuditing
 public class SecurityConfig {
 
         @Autowired
         @Lazy
         private UserDetailsService userDetailsService;
+
+        @Autowired
+        private CustomAuthenticationSuccessHandler authenticationSuccessHandler;
+
+        @Autowired
+        private CustomAuthenticationFailureHandler authenticationFailureHandler;
+
+        @Autowired
+        private CustomLogoutSuccessHandler logoutSuccessHandler;
 
         /**
          * PasswordEncoder bean for password hashing
@@ -34,6 +48,16 @@ public class SecurityConfig {
         @Bean
         public PasswordEncoder passwordEncoder() {
                 return new BCryptPasswordEncoder();
+        }
+
+        /**
+         * ObjectMapper bean for JSON serialization
+         * 
+         * @return ObjectMapper instance
+         */
+        @Bean
+        public com.fasterxml.jackson.databind.ObjectMapper objectMapper() {
+                return new com.fasterxml.jackson.databind.ObjectMapper();
         }
 
         /**
@@ -106,6 +130,10 @@ public class SecurityConfig {
                                                 .requestMatchers(new AntPathRequestMatcher("/user-management/**"))
                                                 .authenticated()
 
+                                                // Transaction Log 관리 - 인증 필요
+                                                .requestMatchers(new AntPathRequestMatcher("/transaction-log/**"))
+                                                .authenticated()
+
                                                 // EPlaton 관리 - 인증 필요
                                                 .requestMatchers(new AntPathRequestMatcher("/eplaton/**"))
                                                 .authenticated()
@@ -135,12 +163,12 @@ public class SecurityConfig {
                                                 .anyRequest().authenticated())
                                 .formLogin(form -> form
                                                 .loginPage("/login")
-                                                .defaultSuccessUrl("/home")
-                                                .failureUrl("/login?error=true")
+                                                .successHandler(authenticationSuccessHandler)
+                                                .failureHandler(authenticationFailureHandler)
                                                 .permitAll())
                                 .logout(logout -> logout
                                                 .logoutUrl("/logout")
-                                                .logoutSuccessUrl("/login?logout=true")
+                                                .logoutSuccessHandler(logoutSuccessHandler)
                                                 .invalidateHttpSession(true)
                                                 .deleteCookies("JSESSIONID")
                                                 .permitAll())

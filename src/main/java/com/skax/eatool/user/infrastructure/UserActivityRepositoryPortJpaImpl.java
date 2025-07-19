@@ -4,6 +4,7 @@ import com.skax.eatool.user.domain.UserActivity;
 import com.skax.eatool.user.infrastructure.jpa.UserActivityEntity;
 import com.skax.eatool.user.infrastructure.jpa.UserActivityRepositoryJpa;
 import com.skax.eatool.user.service.port.UserActivityRepositoryPort;
+import org.springframework.context.annotation.Primary;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
  * 사용자 활동 로그 JPA Repository 구현체
  */
 @Repository("userActivityRepositoryPortJpaImpl")
+@Primary
 @RequiredArgsConstructor
 @Slf4j
 public class UserActivityRepositoryPortJpaImpl implements UserActivityRepositoryPort {
@@ -79,7 +81,7 @@ public class UserActivityRepositoryPortJpaImpl implements UserActivityRepository
         public List<UserActivity> findByUserId(String userId) {
                 log.info("[UserActivityRepositoryPortJpaImpl] findByUserId START - userId: {}", userId);
 
-                List<UserActivity> result = userActivityRepositoryJpa.findByUserIdOrderByTimestampDesc(userId)
+                List<UserActivity> result = userActivityRepositoryJpa.findByUserIdOrderByActivityTimestampDesc(userId)
                                 .stream()
                                 .map(UserActivityEntity::toDomain)
                                 .collect(Collectors.toList());
@@ -93,7 +95,8 @@ public class UserActivityRepositoryPortJpaImpl implements UserActivityRepository
                 log.info("[UserActivityRepositoryPortJpaImpl] findByUserId(Pageable) START - userId: {}, pageable: {}",
                                 userId, pageable);
 
-                Page<UserActivity> result = userActivityRepositoryJpa.findByUserIdOrderByTimestampDesc(userId, pageable)
+                Page<UserActivity> result = userActivityRepositoryJpa
+                                .findByUserIdOrderByActivityTimestampDesc(userId, pageable)
                                 .map(UserActivityEntity::toDomain);
 
                 log.info("[UserActivityRepositoryPortJpaImpl] findByUserId(Pageable) END - totalElements: {}",
@@ -107,7 +110,7 @@ public class UserActivityRepositoryPortJpaImpl implements UserActivityRepository
                                 activityType);
 
                 List<UserActivity> result = userActivityRepositoryJpa
-                                .findByActivityTypeOrderByTimestampDesc(activityType)
+                                .findByActivityTypeOrderByActivityTimestampDesc(activityType)
                                 .stream()
                                 .map(UserActivityEntity::toDomain)
                                 .collect(Collectors.toList());
@@ -120,7 +123,7 @@ public class UserActivityRepositoryPortJpaImpl implements UserActivityRepository
         public List<UserActivity> findByStatus(String status) {
                 log.info("[UserActivityRepositoryPortJpaImpl] findByStatus START - status: {}", status);
 
-                List<UserActivity> result = userActivityRepositoryJpa.findByStatusOrderByTimestampDesc(status)
+                List<UserActivity> result = userActivityRepositoryJpa.findByStatusOrderByActivityTimestampDesc(status)
                                 .stream()
                                 .map(UserActivityEntity::toDomain)
                                 .collect(Collectors.toList());
@@ -133,7 +136,8 @@ public class UserActivityRepositoryPortJpaImpl implements UserActivityRepository
         public List<UserActivity> findByIpAddress(String ipAddress) {
                 log.info("[UserActivityRepositoryPortJpaImpl] findByIpAddress START - ipAddress: {}", ipAddress);
 
-                List<UserActivity> result = userActivityRepositoryJpa.findByIpAddressOrderByTimestampDesc(ipAddress)
+                List<UserActivity> result = userActivityRepositoryJpa
+                                .findByIpAddressOrderByActivityTimestampDesc(ipAddress)
                                 .stream()
                                 .map(UserActivityEntity::toDomain)
                                 .collect(Collectors.toList());
@@ -200,7 +204,12 @@ public class UserActivityRepositoryPortJpaImpl implements UserActivityRepository
         public long countThisWeekActivities() {
                 log.info("[UserActivityRepositoryPortJpaImpl] countThisWeekActivities START");
 
-                long result = userActivityRepositoryJpa.countThisWeekActivities();
+                // 이번 주 시작일과 종료일 계산
+                LocalDateTime now = LocalDateTime.now();
+                LocalDateTime startOfWeek = now.toLocalDate().atStartOfDay().with(java.time.DayOfWeek.MONDAY);
+                LocalDateTime endOfWeek = startOfWeek.plusWeeks(1);
+
+                long result = userActivityRepositoryJpa.countThisWeekActivities(startOfWeek, endOfWeek);
 
                 log.info("[UserActivityRepositoryPortJpaImpl] countThisWeekActivities END - count: {}", result);
                 return result;
@@ -307,6 +316,50 @@ public class UserActivityRepositoryPortJpaImpl implements UserActivityRepository
                                 .collect(Collectors.toList());
 
                 log.info("[UserActivityRepositoryPortJpaImpl] getHourlyStatistics END - count: {}", result.size());
+                return result;
+        }
+
+        @Override
+        public long countByTimestampAfter(LocalDateTime timestamp) {
+                log.info("[UserActivityRepositoryPortJpaImpl] countByTimestampAfter START - timestamp: {}", timestamp);
+
+                long result = userActivityRepositoryJpa.countByActivityTimestampAfter(timestamp);
+
+                log.info("[UserActivityRepositoryPortJpaImpl] countByTimestampAfter END - count: {}", result);
+                return result;
+        }
+
+        @Override
+        public long countByStatus(String status) {
+                log.info("[UserActivityRepositoryPortJpaImpl] countByStatus START - status: {}", status);
+
+                long result = userActivityRepositoryJpa.countByStatus(status);
+
+                log.info("[UserActivityRepositoryPortJpaImpl] countByStatus END - count: {}", result);
+                return result;
+        }
+
+        @Override
+        public long countDistinctUserIdByTimestampAfterAndActivityType(LocalDateTime timestamp, String activityType) {
+                log.info("[UserActivityRepositoryPortJpaImpl] countDistinctUserIdByTimestampAfterAndActivityType START - timestamp: {}, activityType: {}",
+                                timestamp, activityType);
+
+                long result = userActivityRepositoryJpa
+                                .countDistinctUserIdByActivityTimestampAfterAndActivityType(timestamp, activityType);
+
+                log.info("[UserActivityRepositoryPortJpaImpl] countDistinctUserIdByTimestampAfterAndActivityType END - count: {}",
+                                result);
+                return result;
+        }
+
+        @Override
+        public long deleteByTimestampBefore(LocalDateTime timestamp) {
+                log.info("[UserActivityRepositoryPortJpaImpl] deleteByTimestampBefore START - timestamp: {}",
+                                timestamp);
+
+                long result = userActivityRepositoryJpa.deleteByActivityTimestampBefore(timestamp);
+
+                log.info("[UserActivityRepositoryPortJpaImpl] deleteByTimestampBefore END - deletedCount: {}", result);
                 return result;
         }
 }

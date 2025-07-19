@@ -51,29 +51,19 @@ public class UserActivityController {
         // 페이지네이션 설정
         Pageable pageable = PageRequest.of(page, size, Sort.by("timestamp").descending());
 
-        // 활동 로그 조회
-        Page<UserActivity> activitiesPage;
-        if (userId != null && !userId.trim().isEmpty()) {
-            activitiesPage = userActivityServicePort.getActivitiesByUserId(userId, pageable);
-        } else {
-            activitiesPage = userActivityServicePort.getActivities(pageable);
-        }
+        // 활동 로그 조회 - 고급 검색 사용
+        List<UserActivity> allActivities = userActivityServicePort.searchActivities(userId, activityType, status, null,
+                null, null);
 
-        // 필터링된 결과 적용
-        List<UserActivity> filteredActivities = activitiesPage.getContent();
-        if (activityType != null && !activityType.trim().isEmpty()) {
-            filteredActivities = filteredActivities.stream()
-                    .filter(activity -> activityType.equals(activity.getActivityType()))
-                    .toList();
-        }
-        if (status != null && !status.trim().isEmpty()) {
-            filteredActivities = filteredActivities.stream()
-                    .filter(activity -> status.equals(activity.getStatus()))
-                    .toList();
-        }
+        // 페이지네이션 적용
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), allActivities.size());
+        List<UserActivity> pagedActivities = allActivities.subList(start, end);
+        Page<UserActivity> activitiesPage = new org.springframework.data.domain.PageImpl<>(
+                pagedActivities, pageable, allActivities.size());
 
         // 모델에 데이터 추가
-        model.addAttribute("activities", filteredActivities);
+        model.addAttribute("activities", pagedActivities);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", activitiesPage.getTotalPages());
         model.addAttribute("totalElements", activitiesPage.getTotalElements());
@@ -82,7 +72,7 @@ public class UserActivityController {
         model.addAttribute("status", status);
         model.addAttribute("title", "활동 로그");
 
-        log.info("[UserActivityController] activityLogsPage END - activitiesCount: {}", filteredActivities.size());
+        log.info("[UserActivityController] activityLogsPage END - activitiesCount: {}", pagedActivities.size());
         return "user/management/activity-logs";
     }
 

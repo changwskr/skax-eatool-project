@@ -5,6 +5,7 @@ import com.skax.eatool.techspec.controller.request.TechSpecUpdateRequest;
 import com.skax.eatool.techspec.controller.response.TechSpecResponse;
 import com.skax.eatool.techspec.domain.TechSpec;
 import com.skax.eatool.techspec.application.port.in.TechSpecUseCase;
+import com.skax.eatool.user.annotation.LogUserActivity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -82,6 +83,7 @@ public class TechSpecWebController {
      * 기술 스펙 생성 처리
      */
     @PostMapping("/create")
+    @LogUserActivity(activityType = "CREATE", description = "기술 스펙 생성")
     public String createTechSpec(@Valid @ModelAttribute("techSpec") TechSpecCreateRequest request,
             BindingResult result,
             RedirectAttributes redirectAttributes) {
@@ -136,6 +138,7 @@ public class TechSpecWebController {
      * 기술 스펙 수정 처리
      */
     @PostMapping("/{id}/edit")
+    @LogUserActivity(activityType = "UPDATE", description = "기술 스펙 수정")
     public String updateTechSpec(@PathVariable Long id,
             @Valid @ModelAttribute("techSpec") TechSpecUpdateRequest request,
             BindingResult result,
@@ -163,6 +166,7 @@ public class TechSpecWebController {
      * 기술 스펙 삭제 처리
      */
     @PostMapping("/{id}/delete")
+    @LogUserActivity(activityType = "DELETE", description = "기술 스펙 삭제")
     public String deleteTechSpec(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         log.info("Deleting tech spec with ID: {}", id);
 

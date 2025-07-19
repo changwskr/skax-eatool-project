@@ -3,6 +3,7 @@ package com.skax.eatool.deposit.controller;
 import com.skax.eatool.deposit.dto.DepositDTO;
 import com.skax.eatool.deposit.dto.DepositStatistics;
 import com.skax.eatool.deposit.service.DepositService;
+import com.skax.eatool.user.annotation.LogUserActivity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -156,6 +157,7 @@ public class DepositController {
      * 예금 등록 처리
      */
     @PostMapping("/register")
+    @LogUserActivity(activityType = "CREATE", description = "예금 계좌 등록")
     public String register(@ModelAttribute DepositDTO depositDTO, Model model) {
         log.info("[DepositController] register START - accountNumber: {}", depositDTO.getAccountNumber());
 
@@ -232,6 +234,7 @@ public class DepositController {
      * 예금 수정 처리
      */
     @PostMapping("/update")
+    @LogUserActivity(activityType = "UPDATE", description = "예금 계좌 정보 수정")
     public String update(@ModelAttribute DepositDTO depositDTO, Model model) {
         log.info("[DepositController] update START - id: {}", depositDTO.getDepositId());
 
@@ -252,6 +255,7 @@ public class DepositController {
      * 예금 삭제 처리
      */
     @PostMapping("/delete/{id}")
+    @LogUserActivity(activityType = "DELETE", description = "예금 계좌 삭제")
     public String delete(@PathVariable Long id) {
         log.info("[DepositController] delete START - id: {}", id);
 
@@ -288,6 +292,7 @@ public class DepositController {
      */
     @PostMapping("/deposit-money/{id}")
     @ResponseBody
+    @LogUserActivity(activityType = "DEPOSIT", description = "예금 입금")
     public String depositMoney(@PathVariable Long id, @RequestParam BigDecimal amount) {
         log.info("[DepositController] depositMoney START - id: {}, amount: {}", id, amount);
 
@@ -306,6 +311,7 @@ public class DepositController {
      */
     @PostMapping("/withdraw-money/{id}")
     @ResponseBody
+    @LogUserActivity(activityType = "WITHDRAW", description = "예금 출금")
     public String withdrawMoney(@PathVariable Long id, @RequestParam BigDecimal amount) {
         log.info("[DepositController] withdrawMoney START - id: {}, amount: {}", id, amount);
 

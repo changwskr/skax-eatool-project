@@ -201,7 +201,7 @@ INSERT INTO hot_card (card_number, sequence_no, primary_account_no, cif_no, cif_
 -- ========================================
 -- 7. USER ACTIVITIES TABLE DATA (사용자 활동 로그 데이터)
 -- ========================================
-INSERT INTO user_activities (user_id, activity_type, description, ip_address, user_agent, session_id, status, processing_time, additional_info, timestamp) VALUES
+INSERT INTO user_activities (user_id, activity_type, description, ip_address, user_agent, session_id, status, processing_time, additional_info, activity_timestamp) VALUES
 -- Login Activities (로그인 활동)
 ('USER001', 'LOGIN', '사용자 로그인 성공', '192.168.1.100', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'SESS001', 'SUCCESS', 150, '{"loginAttempt": 1}', '2024-01-15 09:30:00'),
 ('USER002', 'LOGIN', '사용자 로그인 성공', '192.168.1.101', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36', 'SESS002', 'SUCCESS', 120, '{"loginAttempt": 1}', '2024-01-15 10:15:00'),

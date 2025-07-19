@@ -38,13 +38,22 @@ public class UserActivityEntity extends BaseEntity {
     @Column(name = "user_agent", length = 500)
     private String userAgent;
 
-    @Column(name = "timestamp", nullable = false)
-    private LocalDateTime timestamp;
+    @Column(name = "session_id", length = 255)
+    private String sessionId;
+
+    @Column(name = "activity_timestamp", nullable = false)
+    private LocalDateTime activityTimestamp;
 
     @Column(name = "status", length = 20, nullable = false)
     private String status;
 
-    // ?�메??객체�?변??
+    @Column(name = "processing_time")
+    private Long processingTime;
+
+    @Column(name = "additional_info", columnDefinition = "TEXT")
+    private String additionalInfo;
+
+    // 도메인 객체로 변환
     public com.skax.eatool.user.domain.UserActivity toDomain() {
         return com.skax.eatool.user.domain.UserActivity.builder()
                 .id(this.id)
@@ -53,12 +62,15 @@ public class UserActivityEntity extends BaseEntity {
                 .description(this.description)
                 .ipAddress(this.ipAddress)
                 .userAgent(this.userAgent)
-                .timestamp(this.timestamp)
+                .sessionId(this.sessionId)
+                .activityTimestamp(this.activityTimestamp)
                 .status(this.status)
+                .processingTime(this.processingTime)
+                .additionalInfo(this.additionalInfo)
                 .build();
     }
 
-    // ?�메??객체?�서 ?�티???�성
+    // 도메인 객체에서 엔티티 생성
     public static UserActivityEntity fromDomain(com.skax.eatool.user.domain.UserActivity userActivity) {
         return UserActivityEntity.builder()
                 .id(userActivity.getId())
@@ -67,8 +79,11 @@ public class UserActivityEntity extends BaseEntity {
                 .description(userActivity.getDescription())
                 .ipAddress(userActivity.getIpAddress())
                 .userAgent(userActivity.getUserAgent())
-                .timestamp(userActivity.getTimestamp())
+                .sessionId(userActivity.getSessionId())
+                .activityTimestamp(userActivity.getActivityTimestamp())
                 .status(userActivity.getStatus())
+                .processingTime(userActivity.getProcessingTime())
+                .additionalInfo(userActivity.getAdditionalInfo())
                 .build();
     }
 }

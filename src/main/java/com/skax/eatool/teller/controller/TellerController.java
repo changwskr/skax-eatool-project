@@ -2,6 +2,7 @@ package com.skax.eatool.teller.controller;
 
 import com.skax.eatool.teller.dto.TellerDTO;
 import com.skax.eatool.teller.service.TellerService;
+import com.skax.eatool.user.annotation.LogUserActivity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -136,6 +137,7 @@ public class TellerController {
      * 텔러 등록 처리
      */
     @PostMapping("/register")
+    @LogUserActivity(activityType = "CREATE", description = "텔러 등록")
     public String register(@ModelAttribute TellerDTO tellerDTO, Model model) {
         log.info("[TellerController] register START - tellerId: {}", tellerDTO.getTellerId());
 
@@ -212,6 +214,7 @@ public class TellerController {
      * 텔러 수정 처리
      */
     @PostMapping("/update")
+    @LogUserActivity(activityType = "UPDATE", description = "텔러 정보 수정")
     public String update(@ModelAttribute TellerDTO tellerDTO, Model model) {
         log.info("[TellerController] update START - id: {}", tellerDTO.getId());
 
@@ -232,6 +235,7 @@ public class TellerController {
      * 텔러 삭제 처리
      */
     @PostMapping("/delete/{id}")
+    @LogUserActivity(activityType = "DELETE", description = "텔러 삭제")
     public String delete(@PathVariable Long id) {
         log.info("[TellerController] delete START - id: {}", id);
 

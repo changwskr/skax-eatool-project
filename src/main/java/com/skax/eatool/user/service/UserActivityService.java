@@ -6,11 +6,10 @@ import com.skax.eatool.user.service.port.UserActivityRepositoryPort;
 import com.skax.eatool.user.service.port.UserActivityServicePort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,28 +17,19 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * 사용자 활동 로그 서비스 구현체
+ * 사용자 활동 서비스 구현체
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserActivityService implements UserActivityServicePort {
 
-    @Qualifier("userActivityRepositoryPortMybatisImpl")
     private final UserActivityRepositoryPort userActivityRepositoryPort;
 
     @Override
     @Transactional
     public UserActivity saveActivity(UserActivity userActivity) {
-        log.info("[UserActivityService] saveActivity START - userId: {}, activityType: {}",
-                userActivity.getUserId(), userActivity.getActivityType());
-
-        if (userActivity.getTimestamp() == null) {
-            userActivity.setTimestamp(LocalDateTime.now());
-        }
-        if (userActivity.getStatus() == null) {
-            userActivity.setStatus("SUCCESS");
-        }
+        log.info("[UserActivityService] saveActivity START - userId: {}", userActivity.getUserId());
 
         UserActivity result = userActivityRepositoryPort.save(userActivity);
 
@@ -60,7 +50,7 @@ public class UserActivityService implements UserActivityServicePort {
                 .userAgent(userAgent)
                 .sessionId(sessionId)
                 .status("SUCCESS")
-                .timestamp(LocalDateTime.now())
+                .activityTimestamp(LocalDateTime.now())
                 .processingTime(0L)
                 .additionalInfo("{\"loginAttempt\": 1}")
                 .build();
@@ -84,7 +74,7 @@ public class UserActivityService implements UserActivityServicePort {
                 .userAgent(userAgent)
                 .sessionId(sessionId)
                 .status("SUCCESS")
-                .timestamp(LocalDateTime.now())
+                .activityTimestamp(LocalDateTime.now())
                 .processingTime(0L)
                 .additionalInfo("{\"logoutReason\": \"user_request\"}")
                 .build();
@@ -108,7 +98,7 @@ public class UserActivityService implements UserActivityServicePort {
                 .userAgent(userAgent)
                 .sessionId(UUID.randomUUID().toString())
                 .status("SUCCESS")
-                .timestamp(LocalDateTime.now())
+                .activityTimestamp(LocalDateTime.now())
                 .processingTime(0L)
                 .additionalInfo("{\"operation\": \"user_registration\"}")
                 .build();
@@ -132,7 +122,7 @@ public class UserActivityService implements UserActivityServicePort {
                 .userAgent(userAgent)
                 .sessionId(UUID.randomUUID().toString())
                 .status("SUCCESS")
-                .timestamp(LocalDateTime.now())
+                .activityTimestamp(LocalDateTime.now())
                 .processingTime(0L)
                 .additionalInfo("{\"operation\": \"user_update\"}")
                 .build();
@@ -156,7 +146,7 @@ public class UserActivityService implements UserActivityServicePort {
                 .userAgent(userAgent)
                 .sessionId(UUID.randomUUID().toString())
                 .status("SUCCESS")
-                .timestamp(LocalDateTime.now())
+                .activityTimestamp(LocalDateTime.now())
                 .processingTime(0L)
                 .additionalInfo("{\"operation\": \"user_deletion\"}")
                 .build();
@@ -289,30 +279,32 @@ public class UserActivityService implements UserActivityServicePort {
     public UserActivityStatistics getActivityStatistics() {
         log.info("[UserActivityService] getActivityStatistics START");
 
-        long todayActivities = userActivityRepositoryPort.countTodayActivities();
-        long thisWeekActivities = userActivityRepositoryPort.countThisWeekActivities();
-        long failedLogs = userActivityRepositoryPort.countFailedLogs();
-        long activeUsers = userActivityRepositoryPort.countActiveUsers();
-        long totalActivities = userActivityRepositoryPort.findAll().size();
+        // 최근 24시간 활동 수
+        LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
+        long todayActivities = userActivityRepositoryPort.countByTimestampAfter(yesterday);
 
-        // 성공한 로그 수 (전체 - 실패)
-        long successLogs = totalActivities - failedLogs;
+        // 최근 7일 활동 수
+        LocalDateTime weekAgo = LocalDateTime.now().minusWeeks(1);
+        long thisWeekActivities = userActivityRepositoryPort.countByTimestampAfter(weekAgo);
 
-        // 대기 중인 로그 수 (임시로 0으로 설정)
-        long pendingLogs = 0;
+        // 실패한 로그 수
+        long failedLogs = userActivityRepositoryPort.countByStatus("FAILED");
+
+        // 최근 로그인 사용자 수 (최근 24시간)
+        long activeUsers = userActivityRepositoryPort.countDistinctUserIdByTimestampAfterAndActivityType(yesterday,
+                "LOGIN");
 
         UserActivityStatistics statistics = UserActivityStatistics.builder()
                 .todayActivities(todayActivities)
                 .thisWeekActivities(thisWeekActivities)
                 .failedLogs(failedLogs)
                 .activeUsers(activeUsers)
-                .totalActivities(totalActivities)
-                .successLogs(successLogs)
-                .pendingLogs(pendingLogs)
                 .build();
 
-        log.info("[UserActivityService] getActivityStatistics END - today: {}, week: {}, failed: {}, active: {}",
+        log.info(
+                "[UserActivityService] getActivityStatistics END - todayActivities: {}, thisWeekActivities: {}, failedLogs: {}, activeUsers: {}",
                 todayActivities, thisWeekActivities, failedLogs, activeUsers);
+
         return statistics;
     }
 
@@ -331,9 +323,11 @@ public class UserActivityService implements UserActivityServicePort {
     public void deleteOldActivities() {
         log.info("[UserActivityService] deleteOldActivities START");
 
-        userActivityRepositoryPort.deleteOldActivities();
+        // 30일 이전의 활동 로그 삭제
+        LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
+        long deletedCount = userActivityRepositoryPort.deleteByTimestampBefore(thirtyDaysAgo);
 
-        log.info("[UserActivityService] deleteOldActivities END");
+        log.info("[UserActivityService] deleteOldActivities END - deletedCount: {}", deletedCount);
     }
 
     @Override

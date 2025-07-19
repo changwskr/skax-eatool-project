@@ -155,4 +155,9 @@ public interface UserActivityRepositoryMybatis {
          * 시간대별 활동 통계 조회
          */
         List<Map<String, Object>> getHourlyStatistics();
+
+        /**
+         * 특정 시간 이전의 활동 로그 삭제
+         */
+        int deleteByActivityTimestampBefore(@Param("timestamp") java.time.LocalDateTime timestamp);
 }

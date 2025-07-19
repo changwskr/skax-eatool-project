@@ -69,7 +69,7 @@ public class UserActivity {
     /**
      * 활동 발생 시간
      */
-    private LocalDateTime timestamp;
+    private LocalDateTime activityTimestamp;
 
     /**
      * 생성 시간

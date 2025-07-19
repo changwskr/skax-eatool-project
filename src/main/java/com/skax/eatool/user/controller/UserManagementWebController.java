@@ -1,5 +1,6 @@
 package com.skax.eatool.user.controller;
 
+import com.skax.eatool.user.annotation.LogUserActivity;
 import com.skax.eatool.user.domain.SecurityPolicy;
 import com.skax.eatool.user.domain.User;
 import com.skax.eatool.user.domain.UserActivity;
@@ -74,6 +75,7 @@ public class UserManagementWebController {
      * 사용자 등록 처리
      */
     @PostMapping("/register")
+    @LogUserActivity(activityType = "CREATE", description = "사용자 등록")
     public String registerUser(@ModelAttribute("user") User user, Model model) {
         log.info("[UserManagementWebController.registerUser START]");
 
@@ -166,6 +168,7 @@ public class UserManagementWebController {
      * 사용자 수정 처리
      */
     @PostMapping("/edit/{id}")
+    @LogUserActivity(activityType = "UPDATE", description = "사용자 정보 수정")
     public String updateUser(@PathVariable Long id, @ModelAttribute("user") User user, Model model) {
         log.info("[UserManagementWebController.updateUser START] - id: {}", id);
 
@@ -191,6 +194,7 @@ public class UserManagementWebController {
      * 사용자 삭제 처리
      */
     @PostMapping("/delete/{id}")
+    @LogUserActivity(activityType = "DELETE", description = "사용자 삭제")
     public String deleteUser(@PathVariable Long id, Model model) {
         log.info("[UserManagementWebController.deleteUser START] - id: {}", id);
 
@@ -294,90 +298,6 @@ public class UserManagementWebController {
     }
 
     /**
-     * 동적 로그 페이지
-     */
-    @GetMapping("/activity-logs")
-    public String activityLogsPage(
-            @RequestParam(required = false) Long userId,
-            @RequestParam(required = false) String activityType,
-            @RequestParam(required = false) String status,
-            @PageableDefault(size = 20) Pageable pageable,
-            Model model) {
-        log.info("[UserManagementWebController.activityLogsPage START]");
-
-        List<UserActivity> activities;
-        if (userId != null) {
-            activities = userActivityService.getActivitiesByUserId(userId.toString());
-        } else if (activityType != null) {
-            activities = userActivityService.getActivitiesByType(activityType);
-        } else if (status != null) {
-            activities = userActivityService.getActivitiesByStatus(status);
-        } else {
-            activities = userActivityService.getRecentActivities(pageable);
-        }
-
-        model.addAttribute("title", "동적 로그");
-        model.addAttribute("activities", activities);
-        model.addAttribute("userId", userId);
-        model.addAttribute("activityType", activityType);
-        model.addAttribute("status", status);
-
-        log.info("[UserManagementWebController.activityLogsPage END]");
-        return "user/management/activity-logs";
-    }
-
-    /**
-     * 사용자별 동적 로그 페이지
-     */
-    @GetMapping("/activity-logs/user/{userId}")
-    public String userActivityLogsPage(
-            @PathVariable Long userId,
-            @PageableDefault(size = 20) Pageable pageable,
-            Model model) {
-        log.info("[UserManagementWebController.userActivityLogsPage START]");
-
-        Page<UserActivity> activities = userActivityService.getActivitiesByUserId(userId.toString(), pageable);
-
-        model.addAttribute("title", "사용자 동적 로그");
-        model.addAttribute("activities", activities);
-        model.addAttribute("userId", userId);
-
-        log.info("[UserManagementWebController.userActivityLogsPage END]");
-        return "user/management/user-activity-logs";
-    }
-
-    /**
-     * 기간별 동적 로그 페이지
-     */
-    @GetMapping("/activity-logs/date-range")
-    public String dateRangeActivityLogsPage(
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
-            Model model) {
-        log.info("[UserManagementWebController.dateRangeActivityLogsPage START]");
-
-        List<UserActivity> activities;
-        if (startDate != null && endDate != null) {
-            activities = userActivityService.getActivitiesByDateRange(startDate, endDate);
-        } else {
-            // 기본값: 최근 7일
-            LocalDateTime defaultEndDate = LocalDateTime.now();
-            LocalDateTime defaultStartDate = defaultEndDate.minusDays(7);
-            activities = userActivityService.getActivitiesByDateRange(defaultStartDate, defaultEndDate);
-            startDate = defaultStartDate;
-            endDate = defaultEndDate;
-        }
-
-        model.addAttribute("title", "기간별 동적 로그");
-        model.addAttribute("activities", activities);
-        model.addAttribute("startDate", startDate);
-        model.addAttribute("endDate", endDate);
-
-        log.info("[UserManagementWebController.dateRangeActivityLogsPage END]");
-        return "user/management/date-range-activity-logs";
-    }
-
-    /**
      * 보안 정책 관리 페이지
      */
     @GetMapping("/security/policies")
@@ -453,6 +373,7 @@ public class UserManagementWebController {
      * 비밀번호 정책 저장
      */
     @PostMapping("/security/password-policies")
+    @LogUserActivity(activityType = "UPDATE", description = "비밀번호 정책 수정")
     public String savePasswordPolicies(
             @RequestParam(required = false) Integer minLength,
             @RequestParam(required = false) Integer maxLength,
@@ -491,6 +412,7 @@ public class UserManagementWebController {
      * 세션 정책 저장
      */
     @PostMapping("/security/session-policies")
+    @LogUserActivity(activityType = "UPDATE", description = "세션 정책 수정")
     public String saveSessionPolicies(
             @RequestParam(required = false) Integer sessionTimeout,
             @RequestParam(required = false) Integer idleTimeout,
@@ -527,6 +449,7 @@ public class UserManagementWebController {
      * IP 화이트리스트 정책 저장
      */
     @PostMapping("/security/ip-whitelist-policies")
+    @LogUserActivity(activityType = "UPDATE", description = "IP 화이트리스트 정책 수정")
     public String saveIpWhitelistPolicies(
             @RequestParam(required = false, defaultValue = "false") boolean enableIPWhitelist,
             @RequestParam(required = false, defaultValue = "false") boolean logBlockedAccess,

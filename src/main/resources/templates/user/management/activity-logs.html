@@ -299,29 +299,29 @@
         </div>
         
         <!-- 통계 카드 -->
-        <div class="row mb-4">
+        <div class="row mb-4" th:if="${statistics != null}">
             <div class="col-md-3">
                 <div class="stats-card">
-                    <div class="stats-number">1,234</div>
-                    <div class="stats-label">오늘 활동</div>
+                    <div class="stats-number" th:text="${statistics.todayActivities}">0</div>
+                    <div class="stats-label">최근 24시간 활동</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stats-card">
-                    <div class="stats-number">8,567</div>
-                    <div class="stats-label">이번 주 활동</div>
+                    <div class="stats-number" th:text="${statistics.thisWeekActivities}">0</div>
+                    <div class="stats-label">최근 7일 활동</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stats-card">
-                    <div class="stats-number">45</div>
+                    <div class="stats-number" th:text="${statistics.failedLogs}">0</div>
                     <div class="stats-label">실패한 로그</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stats-card">
-                    <div class="stats-number">150</div>
-                    <div class="stats-label">활성 사용자</div>
+                    <div class="stats-number" th:text="${statistics.activeUsers}">0</div>
+                    <div class="stats-label">최근 로그인 사용자</div>
                 </div>
             </div>
         </div>
@@ -386,7 +386,7 @@
                     </thead>
                     <tbody>
                         <tr th:each="activity : ${activities}">
-                            <td th:text="${#temporals.format(activity.timestamp, 'yyyy-MM-dd HH:mm:ss')}">
+                            <td th:text="${#temporals.format(activity.activityTimestamp, 'yyyy-MM-dd HH:mm:ss')}">
                                 2024-01-15 14:30:25
                             </td>
                             <td>
@@ -418,70 +418,14 @@
                             </td>
                         </tr>
                         
-                        <!-- 샘플 데이터 (실제 데이터가 없을 때 표시) -->
+                        <!-- 데이터가 없을 때 메시지 -->
                         <tr th:if="${activities == null or activities.empty}">
-                            <td>2024-01-15 14:30:25</td>
-                            <td><strong>admin</strong></td>
-                            <td><span class="activity-badge activity-login">LOGIN</span></td>
-                            <td>사용자 로그인 성공</td>
-                            <td>192.168.1.100</td>
-                            <td><span class="status-badge status-success">SUCCESS</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-info" onclick="showDetails('1')">
-                                    <i class="fas fa-eye"></i> 상세
-                                </button>
-                            </td>
-                        </tr>
-                        <tr th:if="${activities == null or activities.empty}">
-                            <td>2024-01-15 14:25:10</td>
-                            <td><strong>user001</strong></td>
-                            <td><span class="activity-badge activity-create">CREATE</span></td>
-                            <td>새 사용자 등록</td>
-                            <td>192.168.1.101</td>
-                            <td><span class="status-badge status-success">SUCCESS</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-info" onclick="showDetails('2')">
-                                    <i class="fas fa-eye"></i> 상세
-                                </button>
-                            </td>
-                        </tr>
-                        <tr th:if="${activities == null or activities.empty}">
-                            <td>2024-01-15 14:20:45</td>
-                            <td><strong>user002</strong></td>
-                            <td><span class="activity-badge activity-logout">LOGOUT</span></td>
-                            <td>사용자 로그아웃</td>
-                            <td>192.168.1.102</td>
-                            <td><span class="status-badge status-success">SUCCESS</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-info" onclick="showDetails('3')">
-                                    <i class="fas fa-eye"></i> 상세
-                                </button>
-                            </td>
-                        </tr>
-                        <tr th:if="${activities == null or activities.empty}">
-                            <td>2024-01-15 14:15:30</td>
-                            <td><strong>unknown</strong></td>
-                            <td><span class="activity-badge activity-login">LOGIN</span></td>
-                            <td>로그인 시도 실패</td>
-                            <td>192.168.1.103</td>
-                            <td><span class="status-badge status-failed">FAILED</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-info" onclick="showDetails('4')">
-                                    <i class="fas fa-eye"></i> 상세
-                                </button>
-                            </td>
-                        </tr>
-                        <tr th:if="${activities == null or activities.empty}">
-                            <td>2024-01-15 14:10:15</td>
-                            <td><strong>admin</strong></td>
-                            <td><span class="activity-badge activity-update">UPDATE</span></td>
-                            <td>사용자 정보 수정</td>
-                            <td>192.168.1.100</td>
-                            <td><span class="status-badge status-success">SUCCESS</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-info" onclick="showDetails('5')">
-                                    <i class="fas fa-eye"></i> 상세
-                                </button>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                <i class="fas fa-info-circle fa-2x mb-3"></i>
+                                <br>
+                                <strong>검색 결과가 없습니다.</strong>
+                                <br>
+                                <small>다른 검색 조건을 시도해보세요.</small>
                             </td>
                         </tr>
                     </tbody>
@@ -489,25 +433,32 @@
             </div>
             
             <!-- 페이지네이션-->
-            <nav aria-label="활동 로그 페이지네이션" class="mt-4">
+            <nav aria-label="활동 로그 페이지네이션" class="mt-4" th:if="${totalPages > 1}">
                 <ul class="pagination justify-content-center">
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">이전</a>
+                    <!-- 이전 페이지 -->
+                    <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                        <a class="page-link" th:href="@{/user-management-web/activity-logs(page=${currentPage - 1}, userId=${userId}, activityType=${activityType}, status=${status})}">이전</a>
                     </li>
-                    <li class="page-item active">
-                        <a class="page-link" href="#">1</a>
+                    
+                    <!-- 페이지 번호들 -->
+                    <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}" 
+                        th:classappend="${pageNum == currentPage ? 'active' : ''}">
+                        <a class="page-link" th:href="@{/user-management-web/activity-logs(page=${pageNum}, userId=${userId}, activityType=${activityType}, status=${status})}" 
+                           th:text="${pageNum + 1}">1</a>
                     </li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">2</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">3</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">다음</a>
+                    
+                    <!-- 다음 페이지 -->
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+                        <a class="page-link" th:href="@{/user-management-web/activity-logs(page=${currentPage + 1}, userId=${userId}, activityType=${activityType}, status=${status})}">다음</a>
                     </li>
                 </ul>
             </nav>
+            
+            <!-- 검색 결과 정보 -->
+            <div class="text-center text-muted mt-3" th:if="${totalElements > 0}">
+                <small>총 <strong th:text="${totalElements}">0</strong>개의 활동 로그 중 
+                <strong th:text="${currentPage * 10 + 1}">1</strong>-<strong th:text="${currentPage * 10 + activities.size()}">10</strong>번째 결과</small>
+            </div>
             
             <!-- 추가 기능 버튼들-->
             <div class="row mt-4">

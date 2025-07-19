@@ -4,8 +4,6 @@ import java.util.*;
 import java.util.Map;
 
 import com.skax.eatool.framework.transfer.*;
-
-import com.skax.eatool.eplatonframework.transfer.TPMSVCINFO;
 import com.skax.eatool.foundation.utility.*;
 import com.skax.eatool.foundation.logej.*;
 import com.skax.eatool.framework.transaction.constant.TCFConstants;
@@ -32,7 +30,7 @@ import com.skax.eatool.framework.transaction.constant.TCFConstants;
  */
 
 public class TPSVCINFODTO extends DTO {
-  private HashMap<String, Object> tpmsvcinfolist;
+  private HashMap<String, TPMSVCINFO> tpmsvcinfolist;
   private String reqName;
   private String system_name; // CashCard
                               // EPlatonBizDelegateSB에서
@@ -152,7 +150,7 @@ public class TPSVCINFODTO extends DTO {
     return tpfq;
   }
 
-  public HashMap<String, Object> getTpmsvcinfolist() {
+  public HashMap<String, TPMSVCINFO> getTpmsvcinfolist() {
     return tpmsvcinfolist;
   }
 
@@ -200,7 +198,7 @@ public class TPSVCINFODTO extends DTO {
     this.trclass = trclass;
   }
 
-  public void setTpmsvcinfolist(HashMap<String, Object> tpmsvcinfolist) {
+  public void setTpmsvcinfolist(HashMap<String, TPMSVCINFO> tpmsvcinfolist) {
     this.tpmsvcinfolist = tpmsvcinfolist;
   }
 
@@ -257,9 +255,7 @@ public class TPSVCINFODTO extends DTO {
 
     ArrayList<TPMSVCINFO> al = new ArrayList<>();
     while (it.hasNext()) {
-      Object obj = tpmsvcinfolist.get(it.next());
-      // System.out.println("---------:" + obj.getClass().getName());
-      TPMSVCINFO hs = (TPMSVCINFO) obj;
+      TPMSVCINFO hs = tpmsvcinfolist.get(it.next());
       al.add(hs);
     }
     return al;
@@ -279,28 +275,28 @@ public class TPSVCINFODTO extends DTO {
    * 
    * @return TPMSVCINFO object??collection
    */
-  public ArrayList<Map.Entry<String, Object>> getTotalTPMSVCINFO() {
+  public ArrayList<Map.Entry<String, TPMSVCINFO>> getTotalTPMSVCINFO() {
     if (tpmsvcinfolist == null)
       tpmsvcinfolist = new HashMap<>();
 
-    Set<Map.Entry<String, Object>> set = tpmsvcinfolist.entrySet();
-    ArrayList<Map.Entry<String, Object>> al = new ArrayList<>(set);
+    Set<Map.Entry<String, TPMSVCINFO>> set = tpmsvcinfolist.entrySet();
+    ArrayList<Map.Entry<String, TPMSVCINFO>> al = new ArrayList<>(set);
     return al;
   }
 
-  public ArrayList<Object> getTotalTPMSVCINFO(int kk) {
+  public ArrayList<TPMSVCINFO> getTotalTPMSVCINFO(int kk) {
     if (tpmsvcinfolist == null)
       tpmsvcinfolist = new HashMap<>();
 
-    ArrayList<Object> al = new ArrayList<>(this.tpmsvcinfolist.values());
+    ArrayList<TPMSVCINFO> al = new ArrayList<>(this.tpmsvcinfolist.values());
     return al;
   }
 
   public static void prnttpmsvcinfo(EPlatonEvent event) {
-    ArrayList<Map.Entry<String, Object>> al = event.getTPSVCINFODTO().getTotalTPMSVCINFO();
+    ArrayList<Map.Entry<String, TPMSVCINFO>> al = event.getTPSVCINFODTO().getTotalTPMSVCINFO();
     for (int i = 0; i < al.size(); i++) {
-      Map.Entry<String, Object> entry = al.get(i);
-      TPMSVCINFO tm = (TPMSVCINFO) entry.getValue();
+      Map.Entry<String, TPMSVCINFO> entry = al.get(i);
+      TPMSVCINFO tm = entry.getValue();
       LOGEJ.getInstance().printf(1, event,
           "| " + i + " " + tm.getCall_service_name()
               + " " + tm.getCall_tpm_in_time()
@@ -311,11 +307,11 @@ public class TPSVCINFODTO extends DTO {
   }
 
   public TPMSVCINFO removeTPMSVCINFO(String key) {
-    return (TPMSVCINFO) tpmsvcinfolist.remove(key);
+    return tpmsvcinfolist.remove(key);
   }
 
   public TPMSVCINFO gettpmsvcinfo(String key) {
-    return (TPMSVCINFO) tpmsvcinfolist.get(key);
+    return tpmsvcinfolist.get(key);
   }
 
   public boolean addtpmsvcinfo(TPMSVCINFO tpmsvcinfo) {
@@ -332,7 +328,7 @@ public class TPSVCINFODTO extends DTO {
         key = tpmsvcinfo.getCall_service_name() + "." + tpmsvcinfo.getCall_tpm_in_time();
 
       if (tpmsvcinfolist.containsKey(key)) {
-        ctpm = (TPMSVCINFO) tpmsvcinfolist.get(key);
+        ctpm = tpmsvcinfolist.get(key);
         ctpm.setCall_hostseq(tpmsvcinfo.getCall_hostseq());
         ctpm.setCall_location(tpmsvcinfo.getCall_location());
         ctpm.setCall_orgseq(tpmsvcinfo.getCall_orgseq());

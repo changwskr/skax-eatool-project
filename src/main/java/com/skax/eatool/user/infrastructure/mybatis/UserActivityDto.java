@@ -27,9 +27,17 @@ public class UserActivityDto {
     private String status;
     private Long processingTime;
     private String additionalInfo;
-    private LocalDateTime timestamp;
+    private LocalDateTime activityTimestamp;
     private LocalDateTime createdDate;
     private LocalDateTime lastModifiedDate;
+
+    public LocalDateTime getActivityTimestamp() {
+        return activityTimestamp;
+    }
+
+    public void setActivityTimestamp(LocalDateTime activityTimestamp) {
+        this.activityTimestamp = activityTimestamp;
+    }
 
     /**
      * 도메인 모델을 DTO로 변환
@@ -46,7 +54,7 @@ public class UserActivityDto {
                 .status(userActivity.getStatus())
                 .processingTime(userActivity.getProcessingTime())
                 .additionalInfo(userActivity.getAdditionalInfo())
-                .timestamp(userActivity.getTimestamp())
+                .activityTimestamp(userActivity.getActivityTimestamp())
                 .createdDate(userActivity.getCreatedDate())
                 .lastModifiedDate(userActivity.getLastModifiedDate())
                 .build();
@@ -67,7 +75,7 @@ public class UserActivityDto {
                 .status(this.status)
                 .processingTime(this.processingTime)
                 .additionalInfo(this.additionalInfo)
-                .timestamp(this.timestamp)
+                .activityTimestamp(this.activityTimestamp)
                 .createdDate(this.createdDate)
                 .lastModifiedDate(this.lastModifiedDate)
                 .build();

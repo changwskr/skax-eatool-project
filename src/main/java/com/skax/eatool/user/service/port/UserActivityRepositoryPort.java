@@ -126,4 +126,24 @@ public interface UserActivityRepositoryPort {
          * 시간대별 활동 통계 조회
          */
         List<Map<String, Object>> getHourlyStatistics();
+
+        /**
+         * 특정 시간 이후의 활동 로그 수 조회
+         */
+        long countByTimestampAfter(LocalDateTime timestamp);
+
+        /**
+         * 상태별 활동 로그 수 조회
+         */
+        long countByStatus(String status);
+
+        /**
+         * 특정 시간 이후의 특정 활동 타입별 고유 사용자 수 조회
+         */
+        long countDistinctUserIdByTimestampAfterAndActivityType(LocalDateTime timestamp, String activityType);
+
+        /**
+         * 특정 시간 이전의 활동 로그 삭제
+         */
+        long deleteByTimestampBefore(LocalDateTime timestamp);
 }

@@ -6,6 +6,7 @@ import com.skax.eatool.user.infrastructure.mybatis.UserActivityRepositoryMybatis
 import com.skax.eatool.user.service.port.UserActivityRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +20,7 @@ import java.util.Optional;
 /**
  * MyBatis를 사용한 사용자 활동 로그 리포지토리 구현체
  */
-@Repository
+@Repository("userActivityRepositoryPortMybatisImpl")
 @RequiredArgsConstructor
 @Slf4j
 public class UserActivityRepositoryPortMybatisImpl implements UserActivityRepositoryPort {
@@ -317,5 +318,26 @@ public class UserActivityRepositoryPortMybatisImpl implements UserActivityReposi
 
         log.info("[UserActivityRepositoryPortMybatisImpl] getHourlyStatistics END - count: {}", result.size());
         return result;
+    }
+
+    @Override
+    public long deleteByTimestampBefore(java.time.LocalDateTime timestamp) {
+        return userActivityRepositoryMybatis.deleteByActivityTimestampBefore(timestamp);
+    }
+
+    @Override
+    public long countByTimestampAfter(java.time.LocalDateTime timestamp) {
+        throw new UnsupportedOperationException("Mybatis 구현체는 지원하지 않습니다.");
+    }
+
+    @Override
+    public long countByStatus(String status) {
+        throw new UnsupportedOperationException("Mybatis 구현체는 지원하지 않습니다.");
+    }
+
+    @Override
+    public long countDistinctUserIdByTimestampAfterAndActivityType(java.time.LocalDateTime timestamp,
+            String activityType) {
+        throw new UnsupportedOperationException("Mybatis 구현체는 지원하지 않습니다.");
     }
 }

@@ -1,7 +1,5 @@
 package com.skax.eatool.eplatonframework.transfer;
 
-import com.skax.eatool.eplatonframework.transfer.EPlatonEvent;
-import com.skax.eatool.eplatonframework.transfer.TPSVCINFODTO;
 import com.skax.eatool.foundation.utility.CommonUtil;
 import com.skax.eatool.framework.transfer.DTO;
 
@@ -65,20 +63,15 @@ public class TPMSVCINFO extends DTO {
     // Default constructor
   }
 
-  public TPMSVCINFO(String tarsystem, EPlatonEvent event) {
-    TPSVCINFODTO tpmdto = event.getTPSVCINFODTO();
-
-    this.setCall_hostseq(tpmdto.getHostseq()); // 메인버튼 처리번호??
-                                               // TPCsendrecv??썑 媛吏????뒗 eplatonevent媛앹??媛??????
-    this.setCall_orgseq(tpmdto.getOrgseq()); // 메인버튼 오류코드??
-                                             // TPCsendrecv??썑 媛吏????뒗 eplatonevent媛앹??媛????????떎.
-    this.setCall_service_name(tarsystem); // 메인버튼 비용명??????몄?????뒪??챸??紐낆???떎.??????컪?? request_name???? // ??媛??
-                                          // TPCsendrecv???꾨떖??뒗 requestname????
-    this.setCall_tpm_in_time(CommonUtil.GetSysTime()); // TPSsendrecv??옉??컙
-    this.setCall_tpm_out_time(this.getCall_tpm_in_time()); // TPSsendrecv?�낅�??�컙
-
-    this.setError_code("IZZ000"); // TPCsendrecv???�?諛⑹�????? this.setOffset('0'); // TPCsendrecv ??�옉 flag
-
+  // 순환 참조 문제로 인해 새로운 생성자로 대체
+  public TPMSVCINFO(String tarsystem, String hostseq, String orgseq) {
+    this.setCall_hostseq(hostseq); // 메인버튼 처리번호
+    this.setCall_orgseq(orgseq); // 메인버튼 오류코드
+    this.setCall_service_name(tarsystem); // 메인버튼 비용명
+    this.setCall_tpm_in_time(CommonUtil.GetSysTime()); // TPSsendrecv 시작시간
+    this.setCall_tpm_out_time(this.getCall_tpm_in_time()); // TPSsendrecv 종료시간
+    this.setError_code("IZZ000"); // TPCsendrecv 성공코드
+    this.setOffset('0'); // TPCsendrecv 시작 flag
   }
 
   public String getCall_hostseq() {

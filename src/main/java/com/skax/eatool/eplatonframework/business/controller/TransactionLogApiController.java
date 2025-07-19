@@ -17,7 +17,7 @@ import com.skax.eatool.eplatonframework.transfer.EPlatonCommonDTO;
  */
 @RestController
 @RequestMapping("/api/transaction-log")
-public class TransactionLogController extends BaseController {
+public class TransactionLogApiController extends BaseController {
 
     @Autowired
     private TransactionLogService transactionLogService;

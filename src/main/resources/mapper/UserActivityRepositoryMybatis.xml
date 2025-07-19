@@ -221,4 +221,10 @@
         WHERE timestamp < DATE_SUB(NOW(), INTERVAL 30 DAY)
     </delete>
 
+    <!-- 특정 시간 이전의 활동 로그 삭제 -->
+    <delete id="deleteByActivityTimestampBefore" parameterType="java.time.LocalDateTime">
+        DELETE FROM user_activities
+        WHERE activity_timestamp &lt; #{timestamp}
+    </delete>
+
 </mapper> 

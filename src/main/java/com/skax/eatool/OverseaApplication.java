@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -60,6 +61,7 @@ import org.slf4j.LoggerFactory;
         "com.skax.eatool.techspec.infrastructure.jpa"
 })
 @EnableTransactionManagement
+@EnableJpaAuditing
 @EnableAsync
 @EnableScheduling
 public class OverseaApplication {

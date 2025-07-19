@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>트랜잭션 로그 상세 - SKAX AI Tool</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .detail-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .status-badge {
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+        }
+        .info-row {
+            border-bottom: 1px solid #e9ecef;
+            padding: 0.75rem 0;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .info-value {
+            color: #212529;
+        }
+        .timeline-item {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 1rem;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.5rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #007bff;
+        }
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 1.2rem;
+            width: 2px;
+            height: calc(100% + 0.5rem);
+            background-color: #e9ecef;
+        }
+        .timeline-item:last-child::after {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid">
+        <!-- 헤더 -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <nav class="navbar navbar-expand-lg navbar-dark bg-primary rounded">
+                    <div class="container-fluid">
+                        <a class="navbar-brand" href="/transaction-logs">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            트랜잭션 로그 상세
+                        </a>
+                        <div class="navbar-nav ms-auto">
+                            <a class="nav-link" href="/transaction-logs">
+                                <i class="fas fa-list me-1"></i>목록
+                            </a>
+                            <a class="nav-link" href="/transaction-logs/statistics">
+                                <i class="fas fa-chart-bar me-1"></i>통계
+                            </a>
+                            <a class="nav-link" href="/">
+                                <i class="fas fa-home me-1"></i>홈
+                            </a>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+
+        <!-- 트랜잭션 로그 상세 정보 -->
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card detail-card">
+                    <div class="card-header bg-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-info-circle me-2"></i>트랜잭션 상세 정보
+                            </h5>
+                            <div>
+                                <span th:if="${transactionLog.errorCode == 'I0000'}" 
+                                      class="badge bg-success status-badge">
+                                    <i class="fas fa-check me-1"></i>성공
+                                </span>
+                                <span th:unless="${transactionLog.errorCode == 'I0000'}" 
+                                      class="badge bg-danger status-badge">
+                                    <i class="fas fa-times me-1"></i>실패
+                                </span>
+                                <span th:if="${transactionLog.isDeleted}" 
+                                      class="badge bg-secondary status-badge ms-2">
+                                    <i class="fas fa-trash me-1"></i>삭제됨
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="info-row">
+                                    <div class="info-label">트랜잭션 ID</div>
+                                    <div class="info-value" th:text="${transactionLog.transactionId}">TXN001</div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">트랜잭션 번호</div>
+                                    <div class="info-value" th:text="${transactionLog.transactionNo}">TXN001</div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">사용자 ID</div>
+                                    <div class="info-value" th:text="${transactionLog.userId}">user001</div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">시스템명</div>
+                                    <div class="info-value" th:text="${transactionLog.systemName}">SystemA</div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">메서드명</div>
+                                    <div class="info-value" th:text="${transactionLog.methodName}">getUserInfo</div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">호스트명</div>
+                                    <div class="info-value" th:text="${transactionLog.hostName}">HOST001</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-row">
+                                    <div class="info-label">은행 코드</div>
+                                    <div class="info-value" th:text="${transactionLog.bankCode}">001</div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">지점 코드</div>
+                                    <div class="info-value" th:text="${transactionLog.branchCode}">001</div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">채널 타입</div>
+                                    <div class="info-value" th:text="${transactionLog.channelType}">WEB</div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">업무일자</div>
+                                    <div class="info-value" th:text="${transactionLog.businessDate}">20240101</div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">등록일자</div>
+                                    <div class="info-value" th:text="${transactionLog.registerDate}">20240101</div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">IP 주소</div>
+                                    <div class="info-value" th:text="${transactionLog.ipAddress}">192.168.1.1</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 시간 정보 -->
+                <div class="card detail-card mt-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-clock me-2"></i>시간 정보
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline-item">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <strong>시작 시간</strong>
+                                    <div class="text-muted" th:text="${transactionLog.inTime}">12:00:00</div>
+                                </div>
+                                <div class="text-end">
+                                    <strong>종료 시간</strong>
+                                    <div class="text-muted" th:text="${transactionLog.outTime}">12:00:01</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <strong>응답 시간</strong>
+                                    <div class="text-muted">
+                                        <span th:if="${transactionLog.responseTime != null}" 
+                                              th:text="${responseTimeSeconds} + '초'">0.123초</span>
+                                        <span th:unless="${transactionLog.responseTime != null}">-</span>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <strong>생성일시</strong>
+                                    <div class="text-muted" th:text="${#temporals.format(transactionLog.createdAt, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01 12:00:00</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 에러 정보 -->
+                <div class="card detail-card mt-4" th:if="${transactionLog.errorCode != 'I0000'}">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0 text-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>에러 정보
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-row">
+                            <div class="info-label">에러 코드</div>
+                            <div class="info-value">
+                                <span class="badge bg-danger" th:text="${transactionLog.errorCode}">E0001</span>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">이벤트 번호</div>
+                            <div class="info-value" th:text="${transactionLog.eventNo}">EVT001</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 사이드바 -->
+            <div class="col-lg-4">
+                <!-- 작업 버튼 -->
+                <div class="card detail-card mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-tools me-2"></i>작업
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a th:href="@{/transaction-logs}" class="btn btn-outline-primary">
+                                <i class="fas fa-list me-2"></i>목록으로 돌아가기
+                            </a>
+                            <button th:if="${!transactionLog.isDeleted}" 
+                                    th:onclick="'deleteTransactionLog(' + ${transactionLog.id} + ')'"
+                                    class="btn btn-outline-danger">
+                                <i class="fas fa-trash me-2"></i>삭제
+                            </button>
+                            <button th:if="${transactionLog.isDeleted}" 
+                                    th:onclick="'restoreTransactionLog(' + ${transactionLog.id} + ')'"
+                                    class="btn btn-outline-success">
+                                <i class="fas fa-undo me-2"></i>복구
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 관련 정보 -->
+                <div class="card detail-card">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-link me-2"></i>관련 정보
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-row">
+                            <div class="info-label">동일 사용자 로그</div>
+                            <div class="info-value">
+                                <a th:href="@{/transaction-logs(userId=${transactionLog.userId})}" 
+                                   class="btn btn-sm btn-outline-info">
+                                    <i class="fas fa-search me-1"></i>조회
+                                </a>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">동일 시스템 로그</div>
+                            <div class="info-value">
+                                <a th:href="@{/transaction-logs(systemName=${transactionLog.systemName})}" 
+                                   class="btn btn-sm btn-outline-info">
+                                    <i class="fas fa-search me-1"></i>조회
+                                </a>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">동일 메서드 로그</div>
+                            <div class="info-value">
+                                <a th:href="@{/transaction-logs(methodName=${transactionLog.methodName})}" 
+                                   class="btn btn-sm btn-outline-info">
+                                    <i class="fas fa-search me-1"></i>조회
+                                </a>
+                            </div>
+                        </div>
+                        <div class="info-row" th:if="${transactionLog.errorCode != 'I0000'}">
+                            <div class="info-label">동일 에러 로그</div>
+                            <div class="info-value">
+                                <a th:href="@{/transaction-logs(errorCode=${transactionLog.errorCode})}" 
+                                   class="btn btn-sm btn-outline-warning">
+                                    <i class="fas fa-search me-1"></i>조회
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function deleteTransactionLog(id) {
+            if (confirm('정말로 이 트랜잭션 로그를 삭제하시겠습니까?')) {
+                fetch(`/transaction-logs/${id}/delete`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        window.location.href = '/transaction-logs';
+                    } else {
+                        alert('삭제 실패: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('삭제 중 오류가 발생했습니다.');
+                });
+            }
+        }
+
+        function restoreTransactionLog(id) {
+            if (confirm('정말로 이 트랜잭션 로그를 복구하시겠습니까?')) {
+                fetch(`/transaction-logs/${id}/restore`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert('복구 실패: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('복구 중 오류가 발생했습니다.');
+                });
+            }
+        }
+    </script>
+</body>
+</html> 

@@ -1,5 +1,6 @@
 package com.skax.eatool.controller;
 
+import com.skax.eatool.user.annotation.LogUserActivity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -219,6 +220,7 @@ public class CashCardController {
      * 카드 발급 신청 처리
      */
     @PostMapping("/issue/apply")
+    @LogUserActivity(activityType = "CREATE", description = "현금카드 발급 신청")
     public String submitCardIssueApply(@RequestParam String customerName,
             @RequestParam String customerId,
             @RequestParam String phoneNumber,
@@ -555,6 +557,7 @@ public class CashCardController {
      * 카드 정보 수정 처리
      */
     @PostMapping("/manage/update")
+    @LogUserActivity(activityType = "UPDATE", description = "현금카드 정보 수정")
     public String updateCardInfo(@RequestParam String cardNumber,
             @RequestParam String dailyLimit,
             @RequestParam String dailyTrfLimit,
@@ -621,6 +624,7 @@ public class CashCardController {
      * 핫카드 등록 처리
      */
     @PostMapping("/hotcard/register")
+    @LogUserActivity(activityType = "CREATE", description = "핫카드 등록")
     public String registerHotCard(@RequestParam String cardNumber,
             @RequestParam String reason,
             @RequestParam String reportDate,
