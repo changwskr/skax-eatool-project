@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>디버그 테스트 페이지</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .test-card {
+            background: #f8f9fa;
+            border: 2px solid #007bff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .test-card:hover {
+            background: #007bff;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .debug-info {
+            background: #e9ecef;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>?�버�??�스???�이지</h1>
+        <p>???�이지???�릭 ?�벤?��? ?�스?�하�??�한 것입?�다.</p>
+        
+        <div class="debug-info">
+            <h4>?�버 ?�보:</h4>
+            <p>?�이지 로드 ?�간: <span id="loadTime"></span></p>
+            <p>JavaScript ?�태: <span id="jsStatus">?�인 �?.</span></p>
+            <p>링크 개수: <span id="linkCount">?�인 �?.</span></p>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-4">
+                <a href="/user-management-web/register" class="test-card d-block text-decoration-none">
+                    <h3>?�용???�록</h3>
+                    <p>?�릭?�여 ?�용???�록 ?�이지�??�동</p>
+                </a>
+            </div>
+            
+            <div class="col-md-4">
+                <a href="/user-management-web/roles" class="test-card d-block text-decoration-none">
+                    <h3>권한 관�?/h3>
+                    <p>?�릭?�여 권한 관�??�이지�??�동</p>
+                </a>
+            </div>
+            
+            <div class="col-md-4">
+                <a href="/user-management-web/security" class="test-card d-block text-decoration-none">
+                    <h3>보안 관�?/h3>
+                    <p>?�릭?�여 보안 관�??�이지�??�동</p>
+                </a>
+            </div>
+        </div>
+        
+        <div class="row mt-3">
+            <div class="col-md-4">
+                <button class="test-card w-100 border-0" onclick="testButtonClick()">
+                    <h3>JavaScript 버튼</h3>
+                    <p>?�릭?�여 JavaScript 벤트?�트�??�스?�합?�다.</p>
+                </button>
+            </div>
+            
+            <div class="col-md-4">
+                <button class="btn btn-success w-100" onclick="testAlert()">
+                    <h3>Alert ?�스??/h3>
+                    <p>?�릭?�여 Alert ?�스?��? ?�스?�합?�다.</p>
+                </button>
+            </div>
+            
+            <div class="col-md-4">
+                <a href="/user-management-web" class="btn btn-primary w-100">
+                    <h3>메인 ?�이지</h3>
+                    <p>?�릭?�여 메인 ?�이지�??�동</p>
+                </a>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <a href="/user-management-web" class="btn btn-secondary">메인 ?�이지�??�아가�?/a>
+            <button class="btn btn-info ms-2" onclick="refreshPage()">?�이지 ?�로고침</button>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ?�이지 로드 ???�행
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('?�버�??�이지 로드??);
+            
+            // ?�버 ?�보 ?�데?�트
+            document.getElementById('loadTime').textContent = new Date().toLocaleString();
+            document.getElementById('jsStatus').textContent = '?�상??;
+            
+            // 링크 개수 ?�인
+            const links = document.querySelectorAll('a');
+            document.getElementById('linkCount').textContent = links.length;
+            
+            // 모든 링크???�릭 ?�벤??리스??추�?
+            links.forEach((link, index) => {
+                link.addEventListener('click', function(e) {
+                    console.log(`링크 ${index + 1} ?�릭??, this.href);
+                });
+            });
+            
+            // 모든 버튼???�릭 ?�벤??리스??추�?
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach((button, index) => {
+                button.addEventListener('click', function(e) {
+                    console.log(`버튼 ${index + 1} ?�릭??, this.textContent);
+                });
+            });
+        });
+        
+        // ?�스???�수??
+        function testButtonClick() {
+            alert('JavaScript 버튼???�작?�니??');
+            console.log('JavaScript 버튼 ?�릭 ?�공');
+        }
+        
+        function testAlert() {
+            alert('Alert ?�스?��? ?�작?�니??');
+            console.log('Alert ?�스???�공');
+        }
+        
+        function refreshPage() {
+            location.reload();
+        }
+        
+        // ?�이지 로드 ?�료 ?�인
+        window.addEventListener('load', function() {
+            console.log('?�이지 ?�체가 로드??);
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">SKAX AI TOOL System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: #667eea !important;
+        }
+        
+        .navbar-nav .nav-link {
+            color: #333 !important;
+            font-weight: 500;
+            margin: 0 0.5rem;
+            padding: 0.5rem 1rem !important;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            background: #667eea;
+            color: white !important;
+            transform: translateY(-2px);
+        }
+        
+        .navbar-nav .nav-link.active {
+            background: #667eea;
+            color: white !important;
+        }
+        
+        .main-container {
+            padding: 2rem 0;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .service-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .service-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .service-card.cashcard .service-icon {
+            color: #28a745;
+        }
+        
+        .service-card.deposit .service-icon {
+            color: #007bff;
+        }
+        
+        .service-card.teller .service-icon {
+            color: #ffc107;
+        }
+        
+        .service-card.user .service-icon {
+            color: #dc3545;
+        }
+        
+        .service-card.eplaton .service-icon {
+            color: #6f42c1;
+        }
+        
+        .service-card.techspec .service-icon {
+            color: #17a2b8;
+        }
+        
+        .service-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        
+        .service-description {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 3rem;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .service-card {
+                padding: 1.5rem;
+            }
+            
+            .navbar-nav .nav-link {
+                margin: 0.25rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/home">
+                <i class="fas fa-robot"></i> SKAX AI TOOL
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/cashcard">
+                            <i class="fas fa-credit-card"></i> Cash Card
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/deposit">
+                            <i class="fas fa-piggy-bank"></i> Deposit
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/teller">
+                            <i class="fas fa-user-tie"></i> Teller
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user">
+                            <i class="fas fa-users"></i> User
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/eplaton/manage">
+                            <i class="fas fa-cogs"></i> EPlaton
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/techspec">
+                            <i class="fas fa-microchip"></i> Tech Spec
+                        </a>
+                    </li>
+                    <li class="nav-item" th:if="${!isAuthenticated}">
+                        <a class="nav-link" href="/login">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </a>
+                    </li>
+                    <li class="nav-item" th:if="${isAuthenticated}">
+                        <form th:action="@{/logout}" method="post" style="display: inline;">
+                            <button type="submit" class="nav-link btn btn-link" style="border: none; background: none; padding: 0.5rem 1rem;">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-container" style="margin-top: 80px;">
+        <div class="header">
+            <h1><i class="fas fa-robot"></i> SKAX AI TOOL</h1>
+            <p>Banking System Management Portal</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6 col-lg-2">
+                <a href="/cashcard" class="service-card cashcard">
+                    <i class="fas fa-credit-card service-icon"></i>
+                    <div class="service-title">Cash Card</div>
+                    <div class="service-description">
+                        현금카드 발급, 관리, 조회 및 카드 관리 시스템
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-md-6 col-lg-2">
+                <a href="/deposit" class="service-card deposit">
+                    <i class="fas fa-piggy-bank service-icon"></i>
+                    <div class="service-title">Deposit</div>
+                    <div class="service-description">
+                        예금 계좌 관리, 거래 내역 조회 및 계좌 정보 관리
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-md-6 col-lg-2">
+                <a href="/teller" class="service-card teller">
+                    <i class="fas fa-user-tie service-icon"></i>
+                    <div class="service-title">Teller</div>
+                    <div class="service-description">
+                        창구 업무, 고객 서비스 및 거래 처리 시스템
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-md-6 col-lg-2">
+                <a href="/user" class="service-card user">
+                    <i class="fas fa-users service-icon"></i>
+                    <div class="service-title">User</div>
+                    <div class="service-description">
+                        사용자 관리, 권한 설정 및 인증 시스템
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-md-6 col-lg-2">
+                <a href="/eplaton/manage" class="service-card eplaton">
+                    <i class="fas fa-cogs service-icon"></i>
+                    <div class="service-title">EPlaton</div>
+                    <div class="service-description">
+                        EPlaton 비즈니스 델리게이트 실행 및 관리 시스템
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-md-6 col-lg-2">
+                <a href="/techspec" class="service-card techspec">
+                    <i class="fas fa-microchip service-icon"></i>
+                    <div class="service-title">Tech Spec</div>
+                    <div class="service-description">
+                        프로젝트 기술 스택 관리 및 스펙 문서 관리 시스템
+                    </div>
+                </a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; 2024 SKAX AI TOOL System. All rights reserved.</p>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

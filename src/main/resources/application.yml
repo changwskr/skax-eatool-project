@@ -1,0 +1,79 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+      continue-on-error: true
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+  mvc:
+    view:
+      prefix: /templates/
+      suffix: .html
+  h2:
+    console:
+      enabled: true
+  session:
+    timeout: 240m
+    store-type: none
+
+server:
+  port: 8080
+  servlet:
+    session:
+      timeout: 240m # 4시간으로 증가
+      cookie:
+        http-only: true
+        secure: false
+        max-age: 14400 # 4시간 (초 단위)
+        path: /
+        domain: localhost
+
+# Swagger/OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+    doc-expansion: none
+    disable-swagger-default-url: true
+  packages-to-scan: com.skax.eatool.controller
+  paths-to-match: /api/**
+
+# Logging Configuration
+logging:
+  level:
+    com.skax.eatool: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# TPM Service Configuration
+service:
+  call:
+    url: http://localhost:8080
+tpmservice:
+  url: http://localhost:8080
+  timeout: 30
+bizaction-map-filename: classpath:config/eatool-config.xml
